@@ -1,0 +1,11 @@
+regex	[\s\t\r\n,\.\:\!\?\;\'\&\%\#\$\@\~\(\)\{\}\[\]\-\+\=]+
+filter_words    a,all,an,and,any,are,as,at,be,but,by,has,had,have,he,him,his,her,for,from,if,in,is,it,no,now,of,on,or,out,she,that,their,them,there,to,the,this,up,was,we,were,will,with,you,people,hand,hands,sound,green,black,white,yellow,blue,garden
+regex_filter_words	^[a-z].{0\,3}\b
+dbHost	127.0.0.1
+dbPort	1000
+dbUser	db_user
+dbPwd	db_pwd
+xdxf_file	/home/user/work/pet_projects/Vocabulary/dict.xdxf
+
+log_level	3
+

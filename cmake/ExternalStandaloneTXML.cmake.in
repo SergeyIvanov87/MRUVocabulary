@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.1)
+
+project(templatexml NONE)
+
+include(ExternalProject)
+ExternalProject_Add(templatexml
+    URL                 ${TEMPLATE_XML_PATH}
+    PREFIX              ${CMAKE_CURRENT_BINARY_DIR}
+    CMAKE_ARGS          -DWITH_XML2=ON
+                        -DLIBXMLPP_INSTALLED_PATH:STRING=${LIBXMLPP_INSTALLED_PATH}
+                        -DSYSTEM_NAME=${SYSTEM_NAME}
+                        -DLIBXML2_INSTALLED_PATH:STRING=${LIBXML2_INSTALLED_PATH}
+    CMAKE_CACHE_ARGS
+                        -DWITH_XML2:BOOL=ON
+                        -DLIBXMLPP_INSTALLED_PATH:STRING=${LIBXMLPP_INSTALLED_PATH}
+                        -DSYSTEM_NAME:STRING=${SYSTEM_NAME}
+                        -DLIBXML2_INSTALLED_PATH:STRING=${LIBXML2_INSTALLED_PATH}
+#  LOG_BUILD TRUE
+#  LOG_CONFIGURE TRUE
+#  LOG_INSTALL TRUE
+
+    INSTALL_COMMAND     ""
+    BUILD_COMMAND       ""
+    TEST_COMMAND        ""
+)
