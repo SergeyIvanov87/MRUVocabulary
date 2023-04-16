@@ -13,9 +13,6 @@ set (BRANCH_NAME ${PROC_NAME})
 
 #==============================================================================
 
-#3PP Directories
-set (TTL_ROOT "/home/user/work/TTL")
-
 configure_file(${BRANCH_ROOT}/cmake/ExternalMariaDBConnector.cmake.in mariadb-connector-c-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
                 RESULT_VARIABLE result

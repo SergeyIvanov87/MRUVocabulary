@@ -13,13 +13,7 @@
 #include "common/base_command_parser/FilterWords.hpp"
 #include "common/base_command_parser/RegexFilterWords.hpp"
 #include "common/base_command_parser/LogLevel.h"
-#include "common/base_command_parser/CommandArguments.hpp"
 #include <txml/applications/fb2/fb2.hpp>
-
-#include <Framework/ResourcesFramework/ResourcesFramework.h>
-
-//#include <libxml++/libxml++.h>
-//#include <libxml++/parsers/textreader.h>
 
 struct indent {
   int depth_;

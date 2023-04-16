@@ -12,15 +12,11 @@
 #include "common/base_command_parser/XDXFValue.h"
 #include "common/base_command_parser/LogLevel.h"
 #include "common/base_command_parser/TranslationOrder.h"
-#include "common/base_command_parser/CommandArguments.hpp"
 #include <txml/applications/xdxf/xdxf.hpp>
 #include "TranslatorSharedData.h"
 #include "TranslatorSharedDataImpl.h"
 
 #include "decoders/PluginDecodedData.h"
-
-//#include <libxml++/libxml++.h>
-//#include <libxml++/parsers/textreader.h>
 
 struct indent {
   int depth_;
@@ -319,8 +315,7 @@ long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_dat
     check_ctx(translator_ctx);
 
 
-    Stdout std_out;
-    Tracer<Stdout> std_tracer(std_out);
+    txml::StdoutTracer std_tracer;
     size_t found_num = 0;
 
     if (!decoder_ctx)

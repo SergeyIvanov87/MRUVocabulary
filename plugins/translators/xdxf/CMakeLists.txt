@@ -18,19 +18,13 @@ set (DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(TXml REQUIRED)
 
-#3PP Directories
-set (TTL_ROOT "/home/user/work/TTL")
-set (TTL_INC ${TTL_ROOT})
-
-set (3PP_INC_PATH ${TTL_INC})
-
 #Headers dir
 set (INC_DIRECTORIES ${DIRECTORIES}
                      ${DIRECTORIES}/..
                      ${DIRECTORIES}/../..
                      ${DIRECTORIES}/../../interfaces/
                      ${DIRECTORIES}/../../../common/base_command_parser
-                     ${3PP_INC_PATH})
+                     )
 
 #Source dir
 set (SRC_DIRECTORIES ${DIRECTORIES}

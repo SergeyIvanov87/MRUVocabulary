@@ -7,8 +7,6 @@
 #include <string>
 #include <ostream>
 
-#include <Framework/ResourcesFramework/ResourcesFramework.h>
-
 struct SharedTranslatedDataImpl;
 struct SharedTranslatedData
 {

@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.13)
+
+project(ttl-download NONE)
+
+include(ExternalProject)
+ExternalProject_Add(ttl
+    GIT_REPOSITORY      https://github.com/SergeyIvanov87/TTL.git
+    GIT_TAG             master
+    PREFIX              ${CMAKE_CURRENT_BINARY_DIR}
+
+    INSTALL_COMMAND       ""
+    BUILD_COMMAND         ""
+    TEST_COMMAND          ""
+)

@@ -20,11 +20,6 @@ set (DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
 set (CMAKE_CXX_STANDARD 20)                               # yes, it uses c++20
 find_package(TXml REQUIRED)                               # use CMake package
 
-#3PP Directories
-set (TTL_ROOT "/home/user/work/TTL")
-set (TTL_INC ${TTL_ROOT})
-set (3PP_INC_PATH ${TTL_INC})
-
 #Headers dir
 set (INC_DIRECTORIES ${DIRECTORIES}
                      ${DIRECTORIES}/..
@@ -32,7 +27,7 @@ set (INC_DIRECTORIES ${DIRECTORIES}
                      ${DIRECTORIES}/../../interfaces/
                      ${DIRECTORIES}/../../../common/base_command_parser
                      ${DIRECTORIES}/../../decoders/
-                     ${3PP_INC_PATH})
+    )
 
 #Source dir
 set (SRC_DIRECTORIES ${DIRECTORIES}

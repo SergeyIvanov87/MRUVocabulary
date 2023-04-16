@@ -8,7 +8,6 @@
 #include <string>
 #include <ostream>
 
-#include <Framework/ResourcesFramework/ResourcesFramework.h>
 #include <txml/applications/xdxf/xdxf_fwd.h>
 
 struct SharedTranslatedDataImpl

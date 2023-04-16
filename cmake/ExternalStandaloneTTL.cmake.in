@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.1)
+
+project(ttl NONE)
+
+include(ExternalProject)
+ExternalProject_Add(ttl
+    URL                 ${TTL_PATH}
+    PREFIX              ${CMAKE_CURRENT_BINARY_DIR}
+
+    INSTALL_COMMAND     ""
+    BUILD_COMMAND       ""
+    TEST_COMMAND        ""
+)

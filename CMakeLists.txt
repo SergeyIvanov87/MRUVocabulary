@@ -15,11 +15,38 @@ set (BRANCH_NAME ${PROC_NAME})
 
 set(SYSTEM_NAME OFF CACHE BOOL "Configure for SYSTEM_NAME")
 #==============================================================================
-add_subdirectory(plugins)
 
+##### Include TTL
+set (PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
+
+# Download `templatedXML` from github or use external sources
+if (NOT TTL_PATH)
+    message ("Use GITHUB version of TTL")
+    configure_file(${BRANCH_ROOT}/cmake/ExternalTTL.cmake.in ttl-download/CMakeLists.txt)
+else()
+    message ("Use STANDALONE version of TTL in TTL_XML_PATH: ${TTL_PATH}")
+    configure_file(${BRANCH_ROOT}/cmake/ExternalStandaloneTTL.cmake.in ttl-download/CMakeLists.txt)
+endif()
+
+# Configure & Build (optionally) `templatedXML`
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+                RESULT_VARIABLE result
+                OUTPUT_VARIABLE output
+                ERROR_VARIABLE output
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/ttl-download )
+if(result)
+    message(FATAL_ERROR "CMake step for TTL failed: ${result}. Log: ${output}")
+endif()
+
+# Postprocessing of `TTL` configuration
+if (NOT TTL_PATH)
+    set(TTL_PATH ${CMAKE_CURRENT_BINARY_DIR}/src/ttl)
+else()
+    set(TTL_PATH ${CMAKE_CURRENT_BINARY_DIR}/src/ttl)
+endif()
 
 #Common Directories
-set (TTL_ROOT "/home/user/work/TTL")
+set (TTL_ROOT ${TTL_PATH})
 set (TTL_INC ${TTL_ROOT})
 
 set (DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
@@ -41,6 +68,9 @@ set (SRC_DIRECTORIES ${DIRECTORIES}
                      ${CMAKE_CURRENT_SOURCE_DIR}/plugins/interfaces_impl
                      ${CMAKE_CURRENT_SOURCE_DIR}/common/base_command_parser
                      )
+
+#==============================================================================
+add_subdirectory(plugins)
 
 #==============================================================================
 #Compile flags

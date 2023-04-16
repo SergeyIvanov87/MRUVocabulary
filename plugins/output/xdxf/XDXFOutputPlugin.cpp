@@ -12,7 +12,6 @@
 #include "common/base_command_parser/DestinationValue.h"
 #include "common/base_command_parser/DestinationFormat.h"
 #include "common/base_command_parser/LogLevel.h"
-#include "common/base_command_parser/CommandArguments.hpp"
 
 #include "Formatter.hpp"
 #include "TranslatorSharedData.h"
