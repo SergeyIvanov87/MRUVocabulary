@@ -12,9 +12,11 @@
 #include "common/base_command_parser/XDXFValue.h"
 #include "common/base_command_parser/LogLevel.h"
 #include "common/base_command_parser/TranslationOrder.h"
+#include "common/base_command_parser/CommandArguments.hpp"
 #include <txml/applications/xdxf/xdxf.hpp>
 #include "TranslatorSharedData.h"
 #include "TranslatorSharedDataImpl.h"
+
 
 #include "decoders/PluginDecodedData.h"
 
@@ -126,7 +128,17 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
         }
         params--;
 
-        std::string xdxf_path = path->getValue();
+        const std::vector<std::string> &xdxf_pathes = path->getValue();
+        if (xdxf_pathes.empty())
+        {
+            ctx->err = -1;
+            std::cerr << NAME_PLUGIN_FUNC() << " invalid parameters. '"
+                      << XDXFTranslatorPath::class_name() <<"' no any path provided. Please set at list one"
+                      << std::endl;
+            return ctx;
+        }
+
+        const std::string &xdxf_path = xdxf_pathes.front();
         FILE* file = fopen(xdxf_path.c_str(), "r");
         if(!file)
         {

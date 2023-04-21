@@ -10,7 +10,7 @@ inline TypedValue<ValueImpl>::TypedValue(value_t v) :
 }
 
 template<class ValueImpl>
-inline typename TypedValue<ValueImpl>::value_t TypedValue<ValueImpl>::getValue() const
+inline const typename TypedValue<ValueImpl>::value_t &TypedValue<ValueImpl>::getValue() const
 {
     /*std::stringstream ss;
     ss << val;
@@ -28,7 +28,7 @@ inline TypedValue<std::string>::TypedValue(value_t v) :
 {
 }
 
-inline typename TypedValue<std::string>::value_t TypedValue<std::string>::getValue() const
+inline const typename TypedValue<std::string>::value_t &TypedValue<std::string>::getValue() const
 {
     return val;
 }

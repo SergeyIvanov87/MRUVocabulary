@@ -12,6 +12,7 @@
 #include "common/base_command_parser/RegexFilterParam.h"
 #include "common/base_command_parser/FilterWords.hpp"
 #include "common/base_command_parser/RegexFilterWords.hpp"
+#include "common/base_command_parser/CommandArguments.hpp"
 
 
 void __attribute__((constructor)) initPlugin(void)

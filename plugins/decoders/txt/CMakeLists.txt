@@ -22,6 +22,7 @@ set (INC_DIRECTORIES ${DIRECTORIES}
                      ${DIRECTORIES}/../..
                      ${DIRECTORIES}/../../interfaces/
                      ${DIRECTORIES}/../../../common/base_command_parser
+                     ${TTL_ROOT}
     )
 
 #Source dir

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iterator>
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -94,6 +95,7 @@ int main(int argc, const char *argv[])
     {
         dst_format_val.reset( new DestinationFormat("fb2"));
         std::cout << DestinationValue::class_name() << " is empty. Use \":" <<  dst_format_val->getValue() << "\"" << std::endl;
+        return -1;
     }
 
 
@@ -205,7 +207,9 @@ int main(int argc, const char *argv[])
         std::cerr << XDXFTranslatorPath::class_name() << " is empty!" << std::endl;
         return -1;
     }
-    std::cout << XDXFTranslatorPath::class_name() << ": " << xdxf_path->getValue() << std::endl;
+    std::cout << XDXFTranslatorPath::class_name() << ": ";
+    std::copy(xdxf_path->getValue().begin(), xdxf_path->getValue().end(), std::ostream_iterator<std::string>(std::cout, ", "));
+    std::cout << std::endl;
 
     /* PLUGINS */
 

@@ -12,12 +12,14 @@
 #include "common/base_command_parser/DestinationValue.h"
 #include "common/base_command_parser/DestinationFormat.h"
 #include "common/base_command_parser/LogLevel.h"
+#include "common/base_command_parser/CommandArguments.hpp"
 
 #include "Formatter.hpp"
 #include "TranslatorSharedData.h"
 #include "xdxf/TranslatorSharedDataImpl.h"
 
 #include <txml/applications/xdxf/xdxf.hpp>
+#include <txml/applications/xdxf/serializer/to_fb2.hpp>
 //#include <libxml++/libxml++.h>
 //#include <libxml++/parsers/textreader.h>
 
@@ -264,7 +266,7 @@ long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_translated
         ss << R"dict_header(<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
 <description></description>
 <body>)dict_header";
-        ToFB2 out(ss);
+        xdxf::ToFB2 out(ss);
         inner_ctx->translated_data_ptr->impl->format_dump(out);
 
         ss << R"dict_footer(
