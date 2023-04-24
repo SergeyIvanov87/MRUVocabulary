@@ -280,7 +280,15 @@ int main(int argc, const char *argv[])
 
 
     // load plugin TRANSLATOR
-    auto *translatorPlugin = ResourcesFramework::Instance()->getResourceInstancePtr<TranslatorResource>("xdxf");
+    TranslatorResource *translatorPlugin = nullptr;
+    if (xdxf_path->getValue().size() > 1)
+    {
+        translatorPlugin = ResourcesFramework::Instance()->getResourceInstancePtr<TranslatorResource>("multi_xdxf");
+    }
+    else
+    {
+        translatorPlugin = ResourcesFramework::Instance()->getResourceInstancePtr<TranslatorResource>("xdxf");
+    }
     std::stringstream().swap(ss_packer);
     pack_values(ss_packer, xdxf_path, order, logLevel);
     packer_string = ss_packer.str();
