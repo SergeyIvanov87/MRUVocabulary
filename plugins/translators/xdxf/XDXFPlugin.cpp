@@ -15,7 +15,6 @@
 #include "common/base_command_parser/CommandArguments.hpp"
 #include <txml/applications/xdxf/xdxf.hpp>
 #include "PluginTranslatedData.h"
-//#include "TranslatorSharedDataImpl.h"
 
 #include "translators/vers/TranslatedDataStructure_v0.h"
 #include "decoders/PluginDecodedData.h"
