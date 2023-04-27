@@ -22,7 +22,9 @@ struct multi_xdxf_dictionary_context_v0
     std::map<std::string, XMLReaderPtr> xml_readers;
 
     using Article = std::optional<xdxf::XDXFArticle>;
-    std::multimap<std::string, Article> multidictionary;
+    using Dictionary = std::map<std::string/*word*/, Article/*meaning*/>;
+    using Volume = std::map<std::string/*language*/, Dictionary>;
+    Volume multidictionary;
 
     std::unique_ptr<SharedTranslatedData> shared_data_ptr;
 };

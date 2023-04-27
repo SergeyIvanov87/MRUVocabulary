@@ -2,7 +2,6 @@
 #define TRANSLATOR_PLUGIN_WRAPPER_H
 #include <plugins/translators/TranslatorInterface.h>
 #include <plugins/translators/TranslatorExport.h>
-//#include "translators/TranslatorSharedData.h"
 #include "PluginHolder.h"
 
 struct SharedDecodedData;

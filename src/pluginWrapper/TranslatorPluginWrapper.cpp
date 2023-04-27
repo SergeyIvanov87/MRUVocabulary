@@ -4,7 +4,7 @@
 #include <Framework/Utils/StringUtils.h>
 
 #include "decoders/PluginDecodedData.h"
-#include "translators/TranslatorSharedData.h"
+#include "translators/PluginTranslatedData.h"
 #include "pluginWrapper/TranslatorPluginWrapper.h"
 
 

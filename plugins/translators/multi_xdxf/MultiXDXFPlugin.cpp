@@ -14,10 +14,10 @@
 #include "common/base_command_parser/TranslationOrder.h"
 #include "common/base_command_parser/CommandArguments.hpp"
 #include <txml/applications/xdxf/xdxf.hpp>
-#include "TranslatorSharedData.h"
-#include "TranslatorSharedDataImpl.h"
+#include "PluginTranslatedData.h"
+//#include "TranslatorSharedDataImpl.h"
 
-
+#include "translators/vers/TranslatedDataStructure_v0.h"
 #include "decoders/PluginDecodedData.h"
 
 struct indent {
@@ -97,6 +97,40 @@ static void check_ctx(plugin_ctx_t* ctx)
         abort();
     }
 }
+
+
+namespace plugin_inner_op
+{
+    void insert_data(v0::TranslatedDataStructure &out_data, const std::string& word, size_t repeat_num, const std::string& lang_to, std::optional<xdxf::XDXFArticle> article);
+    void dump_data(const v0::TranslatedDataStructure &out_data, std::ostream &out);
+}
+
+template<class ...Args>
+void insert_data(int version, ISharedTranslatedData &out_data, Args&&...args)
+{
+    if (version == 0)
+    {
+        plugin_inner_op::insert_data(dynamic_cast<v0::TranslatedDataStructure&>(out_data), std::forward<Args>(args)...);
+    }
+    else
+    {
+        abort();
+    }
+}
+
+template<class ...Args>
+void dump_data(int version, const ISharedTranslatedData &data, Args&&...args)
+{
+    if (version == 0)
+    {
+        plugin_inner_op::dump_data(dynamic_cast<const v0::TranslatedDataStructure&>(data), std::forward<Args>(args)...);
+    }
+    else
+    {
+        abort();
+    }
+}
+
 
 
 plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
@@ -222,9 +256,11 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
         static const std::string unknown_target_lang("--UNKNOWN--");
         avp_map dictionary_lang_from;
         avp_map dictionary_lang_to;
+        size_t dictionaries_loaded_count = 0;
         for (const auto &val : inner_ctx->filePathes)
         {
             auto dictionary_xml_pointer = std::make_unique<txml::TextReaderWrapper>(val.second);
+            dictionaries_loaded_count++;
             int depth = 0;
 
             // parse xdxf header
@@ -254,6 +290,14 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
             }
 
             // analyze attributes
+            // 1) lang_to
+            if (dictionaries_loaded_count != dictionary_lang_to.size())
+            {
+                // put '--UNKNOWN--' lang
+                dictionary_lang_to.emplace_back(val.second, unknown_target_lang);
+            }
+
+            // 2) lang_from
             auto begin_lang_from = dictionary_lang_from.begin();
             auto rbegin_lang_from = dictionary_lang_from.rbegin();
             if ((begin_lang_from->second != rbegin_lang_from->second))
@@ -270,6 +314,11 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
                 return ctx;
             }
             // parse articles
+
+            assert(!dictionary_lang_to.empty());
+            auto &lang_to_el = dictionary_lang_to.back();
+            const std::string &lang_to = lang_to_el.second;
+            auto &target_dictionary = inner_ctx->multidictionary[lang_to];
             while(dictionary_xml_pointer->read())
             {
                 depth = dictionary_xml_pointer->get_depth();
@@ -304,14 +353,7 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
                 }
                 const std::string& name = art->value<xdxf::KeyPhrase>().value();
 
-                /*aggreagated dictioany
-                find by KeyPhrase name
-                if founded - update Transcription if non exist
-                AND rename KeyPhrase and reinsert it into multidictionary with key `KeyPhrase + lang_to`
-                auto it_pair = inner_ctx->multidictionary.find(name;)
-                {
-                }*/
-                inner_ctx->multidictionary.insert({name, art});
+                target_dictionary.insert({name, art});
             }
         }
     }
@@ -319,6 +361,12 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
     {
         std::cerr << "Exception caught: " << e.what() << std::endl;
         return ctx;
+    }
+
+    // finalize innder ctx creation
+    if (!inner_ctx->shared_data_ptr)
+    {
+        inner_ctx->shared_data_ptr.reset(new SharedTranslatedData(ctx->version));
     }
     ctx->data = reinterpret_cast<void*>(inner_ctx);
     return ctx;
@@ -386,24 +434,21 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
 }
 
 template<class Tracer>
-void translate(size_t freq, const std::string &word, multi_xdxf_dictionary_context_v0* inner_ctx, size_t &found_num, Tracer& tracer)
+void translate(int version, size_t freq, const std::string &word, multi_xdxf_dictionary_context_v0* inner_ctx, size_t &found_num, Tracer& tracer)
 {
-    auto range = inner_ctx->multidictionary.equal_range(word);
-    if (auto it = range.first; it != range.second)
+    for (const auto &lang_dict_pair: inner_ctx->multidictionary)
     {
-        if (!inner_ctx->shared_data_ptr)
+        if (auto it = lang_dict_pair.second.find(word); it != lang_dict_pair.second.end())
         {
-            inner_ctx->shared_data_ptr.reset(new SharedTranslatedData);
+            insert_data(version, inner_ctx->shared_data_ptr->getImpl(), word, freq, lang_dict_pair.first, it->second);
+            found_num++;
         }
-        //-S-
-        inner_ctx->shared_data_ptr->impl->insert(word, freq, it->second);
-        found_num++;
-    }
-    else
-    {
-        if (log_level >= eLogLevel::DEBUG_LEVEL)
+        else
         {
-            tracer.trace(word, " - ", freq, " is not found in dictionaries");
+            if (log_level >= eLogLevel::DEBUG_LEVEL)
+            {
+                tracer.trace(word, " - ", freq, " is not found in dictionaries");
+            }
         }
     }
 }
@@ -426,14 +471,14 @@ long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_dat
     {
         for(auto word_pair = decoder_ctx->counts.begin(); word_pair != decoder_ctx->counts.end(); ++word_pair)
         {
-            translate(word_pair->first, word_pair->second, inner_ctx, found_num, std_tracer);
+            translate(translator_ctx->version, word_pair->first, word_pair->second, inner_ctx, found_num, std_tracer);
         }
     }
     else
     {
         for(auto word_pair = decoder_ctx->counts.rbegin(); word_pair != decoder_ctx->counts.rend(); ++word_pair)
         {
-            translate(word_pair->first, word_pair->second, inner_ctx, found_num, std_tracer);
+            translate(translator_ctx->version, word_pair->first, word_pair->second, inner_ctx, found_num, std_tracer);
         }
     }
 
@@ -457,7 +502,7 @@ char *SHARED_CTX_2_STRING_FUNC(shared_translated_data_t* translated_ctx)
 
 
     std::stringstream ss;
-    translated_ctx->dump(ss);
+    dump_data(translated_ctx->getVersion(), translated_ctx->getImpl(), ss);
 
     const std::string &str = ss.str();
     char *ret = (char*)malloc(str.size());
@@ -470,17 +515,53 @@ const char* NAME_PLUGIN_FUNC()
     return MULTI_XDXF_DICTIONARY_PLUGIN_NAME;
 }
 
-inline void SharedTranslatedDataImpl::dump(std::ostream &out) const
+
+namespace plugin_inner_op
 {
-    out << "Translated words: " << local_dictionary.size() << std::endl;
-    for (const auto& val : local_dictionary)
+void insert_data(v0::TranslatedDataStructure &out_data, const std::string& word, size_t repeat_num, const std::string &lang_to, std::optional<xdxf::XDXFArticle> article)
+{
+    auto &comment = article->node_or<xdxf::Comment>("0");
+
+    std::string &cur_val = comment->value();
+    size_t cur_repeatition_count = std::stoull(cur_val);
+    cur_repeatition_count += repeat_num;
+    cur_val = std::to_string(cur_repeatition_count);
+
+    if (!out_data.local_dictionary.empty())
     {
-        std::get<1>(val)->xml_serialize(out);
+        auto &last_word = out_data.local_dictionary.back();
+        if (std::get<0>(last_word) == word)
+        {
+            auto &articles = std::get<1>(last_word);
+            assert(!articles.empty());
+            if (auto it = articles.find(lang_to); it != articles.end())
+            {
+                it->second = *article;
+            }
+            else
+            {
+                articles.emplace(lang_to, article);
+            }
+            return;
+        }
+    }
+
+    out_data.local_dictionary.emplace_back(std::forward_as_tuple(word,
+                                           v0::TranslatedDataStructure::Articles({{lang_to, article}})));
+
+    (void)repeat_num;
+}
+
+void dump_data(const v0::TranslatedDataStructure &out_data, std::ostream &out)
+{
+    out << "Translated words: " << out_data.local_dictionary.size() << std::endl;
+    for (const auto& val : out_data.local_dictionary)
+    {
+        assert(!std::get<1>(val).empty());
+        out << std::get<1>(val).begin()->first << std::endl;
+        std::get<1>(val).begin()->second->xml_serialize(out);
         out << std::endl;
     }
 }
 
-void SharedTranslatedData::dump(std::ostream &out) const
-{
-    impl->dump(out);
 }

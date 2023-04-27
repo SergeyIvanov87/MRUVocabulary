@@ -11,7 +11,7 @@
 
 template<class Stream>
 struct MultiArticleToFB2 : public txml::FormatSerializerBase<MultiArticleToFB2<Stream>, txml::StaticCheckUnscopedElement,
-                                                 MultiArticle, KeyPhrase, Transcription,
+                                                 MultiArticle, xdxf::KeyPhrase, xdxf::Transcription,
                                                               TranslationContainer, TranslationElement, LanguageTitle>
 {
 
@@ -25,7 +25,7 @@ struct MultiArticleToFB2 : public txml::FormatSerializerBase<MultiArticleToFB2<S
     template<class Element, class Tracer>
     void serialize_impl(const Element& val, Tracer tracer)
     {
-        default_fb2_serializer.serialize_impl(val, tracer)
+        default_fb2_serializer.serialize_impl(val, tracer);
     }
 
     template<class Tracer>
@@ -70,6 +70,6 @@ struct MultiArticleToFB2 : public txml::FormatSerializerBase<MultiArticleToFB2<S
 
     Stream &out;
 private:
-    xdxf::ToFB2 default_fb2_serializer;
+    xdxf::ToFB2<Stream> default_fb2_serializer;
 };
 #endif //MULTI_ARTICLE_FB2_SERIALIZER_HPP
