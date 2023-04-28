@@ -4,8 +4,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "model/MultiArticle.hpp"
-
 #include "../IncomingTranslatorDataInterface.h"
 
 namespace v0
@@ -13,6 +11,7 @@ namespace v0
     struct TranslatedDataStructure;
 }
 
+class MultiArticle;
 namespace v1
 {
 struct SharedOutputDataImpl final : public ISharedTranslatedData
@@ -34,6 +33,9 @@ struct SharedOutputDataImpl final : public ISharedTranslatedData
     // std::vector to save the order of words
     std::vector<translated_tuple_t> local_dictionary;
 
+
+    void format_serialize(std::ostream &out, const std::string &format,txml::EmptyTracer &tracer) const;
+    void format_serialize(std::ostream &out, const std::string &format, txml::StdoutTracer &tracer) const;
    /* void insert(const std::string& word, size_t repeat_num, std::optional<xdxf::XDXFArticle> article);
     void insert(const std::string& word, std::optional<xdxf::XDXFArticle> article) override;
     void insert(const std::string& word, size_t repeat_num, const std::string &lang_to, std::optional<xdxf::XDXFArticle> article);

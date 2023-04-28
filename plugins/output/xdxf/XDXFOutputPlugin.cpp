@@ -24,7 +24,8 @@
 //#include <txml/applications/xdxf/serializer/to_fb2.hpp>
 //#include <libxml++/libxml++.h>
 //#include <libxml++/parsers/textreader.h>
-#include "model/MultiArticleSerializer.hpp"
+
+#include "xdxf/model/MultiArticle.hpp"
 
 static eLogLevel log_level {eLogLevel::ERROR_LEVEL};
 
@@ -73,10 +74,10 @@ namespace plugin_inner_op
     inline void insert_data(v1::SharedOutputDataImpl &data, const std::string &word, const std::optional<MultiArticle> &art);
 
     template<class Formatter>
-    inline void format_dump(const v0::SharedOutputDataImpl &data, Formatter &out);
+    inline void format_dump(const v0::SharedOutputDataImpl &data, Formatter &out, const std::string &format);
 
     template<class Formatter>
-    inline void format_dump(const v1::SharedOutputDataImpl &data, Formatter &out);
+    inline void format_dump(const v1::SharedOutputDataImpl &data, Formatter &out, const std::string &format);
 }
 
 
@@ -113,15 +114,15 @@ inline void insert_data(int version, ISharedTranslatedData &data, const std::str
 }
 
 template<class Formatter>
-inline void format_dump(int version, const ISharedTranslatedData &data, Formatter &out)
+inline void format_dump(int version, const ISharedTranslatedData &data, Formatter &out, const std::string &format)
 {
     if (version == 0)
     {
-        plugin_inner_op::format_dump(dynamic_cast<const v0::SharedOutputDataImpl&>(data), out);
+        plugin_inner_op::format_dump(dynamic_cast<const v0::SharedOutputDataImpl&>(data), out, format);
     }
     else if(version == 1)
     {
-        plugin_inner_op::format_dump(dynamic_cast<const v1::SharedOutputDataImpl&>(data), out);
+        plugin_inner_op::format_dump(dynamic_cast<const v1::SharedOutputDataImpl&>(data), out, format);
     }
     else
     {
@@ -329,8 +330,8 @@ long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_translated
 
         //    if (log_level >= eLogLevel::DEBUG_LEVEL)
         //    {
-            ToXDXF out(ss);
-            format_dump(ctx->version, inner_ctx->translated_data_ptr->getImpl(), out);
+            //ToXDXF out(ss);
+            format_dump(ctx->version, inner_ctx->translated_data_ptr->getImpl(), ss, inner_ctx->fileFormat);
         //    }
         //    else
         //    {
@@ -344,8 +345,8 @@ long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_translated
         ss << R"dict_header(<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
 <description></description>
 <body>)dict_header";
-        xdxf::ToFB2 out(ss);
-        format_dump(ctx->version, inner_ctx->translated_data_ptr->getImpl(), out);
+        //xdxf::ToFB2 out(ss);
+        format_dump(ctx->version, inner_ctx->translated_data_ptr->getImpl(), ss, inner_ctx->fileFormat);
 
         ss << R"dict_footer(
 </body>
@@ -461,53 +462,40 @@ inline void insert_data(v1::SharedOutputDataImpl &data, const std::string &word,
 }
 
 template<class Formatter>
-inline void format_dump(const v0::SharedOutputDataImpl &data, Formatter &out)
+inline void format_dump(const v0::SharedOutputDataImpl &data, Formatter &out, const std::string &format)
 {
     txml::StdoutTracer std_tracer;
     txml::EmptyTracer empty_tracer;
 
     if (log_level >= eLogLevel::DEBUG_LEVEL)
     {
-        for (const auto& val : data.local_dictionary)
-        {
-            assert(!std::get<1>(val).empty());
-            std::get<1>(val).begin()->second->format_serialize(out, std_tracer);
-            //out << std::endl;
-        }
+        v0::format_serialize(data, out, format, std_tracer);
     }
     else
     {
-        for (const auto& val : data.local_dictionary)
-        {
-            assert(!std::get<1>(val).empty());
-            std::get<1>(val).begin()->second->format_serialize(out, empty_tracer);
+        v0::format_serialize(data, out, format, empty_tracer);
+        //for (const auto& val : data.local_dictionary)
+        //{
+            //assert(!std::get<1>(val).empty());
+            //std::get<1>(val).begin()->second->format_serialize(out, empty_tracer);
             //out << std::endl;
-        }
+        //}
     }
 }
 
 template<class Formatter>
-inline void format_dump(const v1::SharedOutputDataImpl &data, Formatter &out)
+inline void format_dump(const v1::SharedOutputDataImpl &data, Formatter &out, const std::string &format)
 {
     txml::StdoutTracer std_tracer;
     txml::EmptyTracer empty_tracer;
 
     if (log_level >= eLogLevel::DEBUG_LEVEL)
     {
-        for (const auto& val : data.local_dictionary)
-        {
-            //assert(!std::get<1>(val).empty());
-            //std::get<1>(val).begin()->second->format_serialize(out, std_tracer);
-        }
+        data.format_serialize(out, format, std_tracer);
     }
     else
     {
-        for (const auto& val : data.local_dictionary)
-        {
-            //assert(!std::get<1>(val).empty());
-            //std::get<1>(val).begin()->second->format_serialize(out, empty_tracer);
-        }
+        data.format_serialize(out, format, empty_tracer);
     }
-
 }
 }

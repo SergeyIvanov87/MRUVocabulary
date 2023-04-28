@@ -1,5 +1,10 @@
-#include "xdxf/vers/TranslatorSharedDataImpl_v0.hpp"
-#include "xdxf/vers/TranslatorSharedDataImpl_v1.hpp"
+#include "vers/TranslatorSharedDataImpl_v0.hpp"
+#include "vers/TranslatorSharedDataImpl_v1.hpp"
+
+#include "model/MultiArticle.hpp"
+#include "xdxf/Formatter.hpp"
+#include "model/MultiArticleSerializer.hpp"
+#include "../translators/vers/TranslatedDataStructure_v0.h"
 
 namespace v1
 {
@@ -35,8 +40,43 @@ SharedOutputDataImpl::~SharedOutputDataImpl() = default;
 // conv
 SharedOutputDataImpl& SharedOutputDataImpl::operator= (const v0::TranslatedDataStructure& src)
 {
-
+    return *this;
 }
+
+template<class Formatter>
+void format_serialize_impl(const SharedOutputDataImpl& src,const std::string &format, std::ostream& out, Formatter &tracer)
+{
+    if (format == "xdxf")
+    {
+        /* TODO
+        ToXDXF format_out(out);
+        for (const auto& val : src.local_dictionary)
+        {
+            std::get<1>(val)->format_serialize(format_out, tracer);
+            //out << std::endl;
+        }
+        */
+    }
+    else if (format == "fb2")
+    {
+        MultiArticleToFB2 format_out(out);
+        for (const auto& val : src.local_dictionary)
+        {
+            std::get<1>(val)->format_serialize(format_out, tracer);
+            //out << std::endl;
+        }
+    }
+}
+
+void SharedOutputDataImpl::format_serialize(std::ostream &out, const std::string &format,txml::EmptyTracer &tracer) const
+{
+    format_serialize_impl(*this, format, out, tracer);
+}
+void SharedOutputDataImpl::format_serialize(std::ostream &out, const std::string &format, txml::StdoutTracer &tracer) const
+{
+    format_serialize_impl(*this, format, out, tracer);
+}
+
 /*
 inline void SharedOutputDataImpl::insert(const std::string& word, size_t repeat_num, std::optional<xdxf::XDXFArticle> article)
 {
@@ -124,4 +164,47 @@ inline void SharedOutputDataImpl::dump(std::ostream &out) const
         }
     }
 }*/
+}
+
+
+
+
+
+namespace v0
+{
+template<class Formatter>
+void format_serialize_impl(const SharedOutputDataImpl& src,const std::string &format, std::ostream& out, Formatter &tracer)
+{
+    if (format == "xdxf")
+    {
+        ToXDXF format_out(out);
+        for (const auto& val : src.local_dictionary)
+        {
+            assert(!std::get<1>(val).empty());
+            std::get<1>(val).begin()->second->format_serialize(format_out, tracer);
+            //out << std::endl;
+        }
+    }
+    else if (format == "fb2")
+    {
+        xdxf::ToFB2 format_out(out);
+        for (const auto& val : src.local_dictionary)
+        {
+            assert(!std::get<1>(val).empty());
+            std::get<1>(val).begin()->second->format_serialize(format_out, tracer);
+            //out << std::endl;
+        }
+    }
+}
+
+
+void format_serialize(const SharedOutputDataImpl& data, std::ostream &out, const std::string &format, txml::StdoutTracer &tracer)
+{
+    format_serialize_impl(data, format, out, tracer);
+}
+
+void format_serialize(const SharedOutputDataImpl& data, std::ostream &out, const std::string &format,txml::EmptyTracer &tracer)
+{
+    format_serialize_impl(data, format, out, tracer);
+}
 }

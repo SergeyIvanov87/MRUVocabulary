@@ -13,6 +13,10 @@
 namespace v0
 {
     using SharedOutputDataImpl = TranslatedDataStructure;
+
+    void format_serialize(const SharedOutputDataImpl& data, std::ostream &out, const std::string &format,txml::EmptyTracer &tracer);
+    void format_serialize(const SharedOutputDataImpl& data, std::ostream &out, const std::string &format, txml::StdoutTracer &tracer);
+
 /*struct SharedOutputDataImpl final : public ISharedTranslatedData
 {
     using Article = std::optional<xdxf::XDXFArticle>;

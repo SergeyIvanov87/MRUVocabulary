@@ -22,7 +22,7 @@ find_package(TXml REQUIRED)                       # use CMake package
 #Headers dir
 set (INC_DIRECTORIES ${DIRECTORIES}
                      ${DIRECTORIES}/model
-                     ${DIRECTORIES}/vers
+                     ${DIRECTORIES}/../vers
                      ${DIRECTORIES}/..
                      ${DIRECTORIES}/../..
                      ${DIRECTORIES}/../../interfaces/
@@ -33,7 +33,7 @@ set (INC_DIRECTORIES ${DIRECTORIES}
 
 #Source dir
 set (SRC_DIRECTORIES ${DIRECTORIES}
-                     ${DIRECTORIES}/vers
+                     ${DIRECTORIES}/../vers
                      ${DIRECTORIES}/../../interfaces_impl/)
 
 #==============================================================================

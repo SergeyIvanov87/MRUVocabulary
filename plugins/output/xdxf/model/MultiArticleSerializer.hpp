@@ -12,9 +12,9 @@
 template<class Stream>
 struct MultiArticleToFB2 : public txml::FormatSerializerBase<MultiArticleToFB2<Stream>, txml::StaticCheckUnscopedElement,
                                                  MultiArticle, xdxf::KeyPhrase, xdxf::Transcription,
-                                                              TranslationContainer, TranslationElement, LanguageTitle>
+                                                              TranslationContainer, TranslationElement, LanguageTitle,
+                                                                    xdxf::TextElement>
 {
-
     MultiArticleToFB2(Stream &stream) :
         out(stream),
         default_fb2_serializer(stream)
