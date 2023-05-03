@@ -12,25 +12,25 @@
 #include "../translators/vers/TranslatedDataStructure_v0.h"
 namespace v0
 {
-    using SharedOutputDataImpl = TranslatedDataStructure;
+    using OutputSessionCtx = TranslatedDataStructure;
 
-    void format_serialize(const SharedOutputDataImpl& data, std::ostream &out, const std::string &format,txml::EmptyTracer &tracer);
-    void format_serialize(const SharedOutputDataImpl& data, std::ostream &out, const std::string &format, txml::StdoutTracer &tracer);
+    void format_serialize(const OutputSessionCtx& data, std::ostream &out, const std::string &format,txml::EmptyTracer &tracer);
+    void format_serialize(const OutputSessionCtx& data, std::ostream &out, const std::string &format, txml::StdoutTracer &tracer);
 
-/*struct SharedOutputDataImpl final : public ISharedTranslatedData
+/*struct OutputSessionCtx final : public ISharedTranslatedData
 {
     using Article = std::optional<xdxf::XDXFArticle>;
     using Articles = std::map<std::string, Article>;
     using translated_tuple_t = std::tuple<std::string, Articles>;
 
-    SharedOutputDataImpl() = default;
-    SharedOutputDataImpl(ISharedTranslatedData&);
-    SharedOutputDataImpl(const SharedOutputDataImpl&) = default;
-    SharedOutputDataImpl(SharedOutputDataImpl&&) = default;
-    SharedOutputDataImpl& operator=(const SharedOutputDataImpl&) = default;
-    SharedOutputDataImpl& operator=(SharedOutputDataImpl&&) = default;
+    OutputSessionCtx() = default;
+    OutputSessionCtx(ISharedTranslatedData&);
+    OutputSessionCtx(const OutputSessionCtx&) = default;
+    OutputSessionCtx(OutputSessionCtx&&) = default;
+    OutputSessionCtx& operator=(const OutputSessionCtx&) = default;
+    OutputSessionCtx& operator=(OutputSessionCtx&&) = default;
 
-    ~SharedOutputDataImpl() override;
+    ~OutputSessionCtx() override;
     // std::vector to save the order of words
     std::vector<translated_tuple_t> local_dictionary;
 

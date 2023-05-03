@@ -121,7 +121,7 @@ bool SET_TYPED_PARAMS_PLUGIN_FUNC(plugin_ctx_t* ctx, int argc, const void *data[
 }
 
 
-long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_translated_data_t *translated_ctx)
+long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_ctx_t *translated_ctx)
 {
     printf("%s - NOT IMPLEMENTED", __FUNCTION__);
     (void)ctx;
@@ -137,6 +137,12 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
         delete reinterpret_cast<db_context_v0*>(ctx->data);
     }
     free(ctx);
+}
+
+
+shared_ctx_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
+{
+    return nullptr;
 }
 
 void RELEASE_SHARED_CTX_FUNC(shared_ctx_t* ctx)

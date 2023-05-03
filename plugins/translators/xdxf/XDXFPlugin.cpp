@@ -51,7 +51,7 @@ static void check_ctx(plugin_ctx_t* ctx)
 {
     if(!ctx or !ctx->data)
     {
-        std::string ret("CTX is emty in plugin: ");
+        std::string ret("CTX is empty in plugin: ");
         ret += NAME_PLUGIN_FUNC();
         perror(ret.c_str());
         abort();
@@ -337,6 +337,12 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     }
     free(ctx);
 }
+
+shared_ctx_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
+{
+    return nullptr;
+}
+
 void RELEASE_SHARED_CTX_FUNC(shared_ctx_t* ctx)
 {
     if (ctx)
@@ -363,7 +369,8 @@ static void translate(int version, size_t freq, const std::string &word, xdxf_di
     }
 }
 
-long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_data_t* decoder_ctx)
+long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_data_t* in_decoder_ctx,
+                                shared_ctx_t *out_translator_session)
 {
     check_ctx(translator_ctx);
 
@@ -371,7 +378,7 @@ long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_dat
     txml::StdoutTracer std_tracer;
     size_t found_num = 0;
 
-    if (!decoder_ctx)
+    if (!in_decoder_ctx)
     {
         return found_num;
     }
@@ -379,40 +386,42 @@ long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_dat
     xdxf_dictionary_context_v0 *inner_ctx = reinterpret_cast<xdxf_dictionary_context_v0*>(translator_ctx->data);
     if (order == "direct")
     {
-        for(auto word_pair = decoder_ctx->counts.begin(); word_pair != decoder_ctx->counts.end(); ++word_pair)
+        for(auto word_pair = in_decoder_ctx->counts.begin(); word_pair != in_decoder_ctx->counts.end(); ++word_pair)
         {
             translate(translator_ctx->version, word_pair->first, word_pair->second, inner_ctx, found_num, std_tracer);
         }
     }
     else
     {
-        for(auto word_pair = decoder_ctx->counts.rbegin(); word_pair != decoder_ctx->counts.rend(); ++word_pair)
+        for(auto word_pair = in_decoder_ctx->counts.rbegin(); word_pair != in_decoder_ctx->counts.rend(); ++word_pair)
         {
             translate(translator_ctx->version, word_pair->first, word_pair->second, inner_ctx, found_num, std_tracer);
         }
     }
 
-    std_tracer.trace("Translated: ", found_num, " from: ", decoder_ctx->words.size());
+    std_tracer.trace("Translated: ", found_num, " from: ", in_decoder_ctx->words.size());
     return found_num;
 }
-
+/* -S-
 shared_translated_data_t* GET_SHARED_TRANSLATED_CTX_FUNC(plugin_ctx_t* translator_ctx)
 {
     check_ctx(translator_ctx);
     xdxf_dictionary_context_v0 *inner_ctx = reinterpret_cast<xdxf_dictionary_context_v0*>(translator_ctx->data);
     return inner_ctx->shared_data_ptr.get();
 }
-
-char *SHARED_CTX_2_STRING_FUNC(shared_translated_data_t* translated_ctx)
+*/
+char *SHARED_CTX_2_STRING_FUNC(plugin_ctx_t* in_translator_ctx, shared_ctx_t* in_translator_session)
 {
-    if (!translated_ctx)
+    if (!in_translator_ctx || !in_translator_session)
     {
         return nullptr;
     }
 
+    ISharedTranslatedData *inner_ctx = reinterpret_cast<ISharedTranslatedData*>(in_translator_session->data);
+    xdxf_dictionary_context_v0 *ctx = reinterpret_cast<xdxf_dictionary_context_v0*> (in_translator_ctx->data);
 
     std::stringstream ss;
-    dump_data(translated_ctx->getVersion(), translated_ctx->getImpl(), ss);
+    dump_data(in_translator_session->version, *inner_ctx, ss);
 
     const std::string &str = ss.str();
     char *ret = (char*)malloc(str.size() + 1);

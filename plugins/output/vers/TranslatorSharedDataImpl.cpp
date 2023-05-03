@@ -7,75 +7,69 @@
 
 namespace v1
 {
-
-SharedOutputDataImpl::SharedOutputDataImpl(ISharedTranslatedData &src)
+OutputSessionCtx::OutputSessionCtx(ISharedTranslatedData &src)
 {
     try
     {
-        // v0 ???
-        v0::TranslatedDataStructure &casted_src = reinterpret_cast<v0::TranslatedDataStructure&>(src);
-        for (const auto &local_dict_pair : casted_src.local_dictionary)
-        {
-            std::optional<MultiArticle> multi_article;
-            const auto &[word, articles] = local_dict_pair;
-            if (!articles.empty())
-            {
-                multi_article = std::make_optional<MultiArticle>();
+        v0::TranslatedDataStructure &casted_src = dynamic_cast<v0::TranslatedDataStructure&>(src);
+        *this  = casted_src;
 
-            }
-            for (const auto &articles_pair : articles)
-            {
-                const auto &[lang, article] = articles_pair;
-
-                // set keyphrase if doesn't esixt
-                auto &key_phrase = multi_article->node_or<xdxf::KeyPhrase>(article->value<xdxf::KeyPhrase>());
-                // set transcription if doesn't esixt
-                if (article->has_value<xdxf::Transcription>())
-                {
-                    if (! multi_article->has_value<xdxf::Transcription>())
-                    {
-                        multi_article->insert<xdxf::Transcription>(article->value<xdxf::Transcription>());
-                    }
-                }
-
-                // put translation into container
-                auto &tr_container = multi_article->node_or<TranslationContainer>();
-
-                xdxf::TextElement text{std::string(lang)};
-                LanguageTitle lang_title(text);
-                TranslationElement al {lang_title, article->value<xdxf::TextElement>()};
-                tr_container->value().emplace_back(al);
-            }
-
-            local_dictionary.emplace_back(word, std::make_shared<MultiArticle>(*multi_article));
-        }
-
-        abort();
     }
     catch(const std::bad_cast &ex)
     {
-        try
-        {
-            v0::SharedOutputDataImpl &casted_src = reinterpret_cast<v0::SharedOutputDataImpl&>(src);
-            *this = casted_src;
-        }
-        catch(const std::bad_cast &ex)
-        {
-            throw std::runtime_error(std::string("Cannot initialize v1::SharedOutputData implementation by an unproper version. Error: ") + ex.what());
-        }
+        throw std::runtime_error(std::string("Cannot initialize v1::SharedOutputData implementation by an unproper version. Error: ") + ex.what());
     }
 }
 
-SharedOutputDataImpl::~SharedOutputDataImpl() = default;
+OutputSessionCtx::~OutputSessionCtx() = default;
 
 // conv
-SharedOutputDataImpl& SharedOutputDataImpl::operator= (const v0::TranslatedDataStructure& src)
+OutputSessionCtx& OutputSessionCtx::operator= (const v0::TranslatedDataStructure& src)
 {
+    for (const auto &local_dict_pair : src.local_dictionary)
+    {
+        std::optional<MultiArticle> multi_article;
+        const auto &[word, articles] = local_dict_pair;
+        if (!articles.empty())
+        {
+            multi_article = std::make_optional<MultiArticle>();
+
+        }
+        for (const auto &articles_pair : articles)
+        {
+            const auto &[lang, article] = articles_pair;
+            // set keyphrase if doesn't esixt
+            auto &key_phrase = multi_article->node_or<xdxf::KeyPhrase>(article->value<xdxf::KeyPhrase>());
+            // set transcription if doesn't esixt
+            if (article->has_value<xdxf::Transcription>())
+            {
+                if (! multi_article->has_value<xdxf::Transcription>())
+                {
+                    multi_article->insert<xdxf::Transcription>(article->value<xdxf::Transcription>());
+                }
+            }
+
+            // put translation into container
+            if (! multi_article->has_value<TranslationContainer>())
+            {
+                multi_article->node_or<TranslationContainer>();
+            }
+            auto &tr_container = multi_article->value<TranslationContainer>();
+
+            xdxf::TextElement text{std::string(lang)};
+            LanguageTitle lang_title(text);
+            TranslationElement al {lang_title, article->value<xdxf::TextElement>()};
+            tr_container.value().emplace_back(al);
+        }
+
+        local_dictionary.emplace_back(word, std::make_shared<MultiArticle>(*multi_article));
+    }
+
     return *this;
 }
 
 template<class Formatter>
-void format_serialize_impl(const SharedOutputDataImpl& src,const std::string &format, std::ostream& out, Formatter &tracer)
+void format_serialize_impl(const OutputSessionCtx& src,const std::string &format, std::ostream& out, Formatter &tracer)
 {
     if (format == "xdxf")
     {
@@ -99,17 +93,17 @@ void format_serialize_impl(const SharedOutputDataImpl& src,const std::string &fo
     }
 }
 
-void SharedOutputDataImpl::format_serialize(std::ostream &out, const std::string &format,txml::EmptyTracer &tracer) const
+void OutputSessionCtx::format_serialize(std::ostream &out, const std::string &format,txml::EmptyTracer &tracer) const
 {
     format_serialize_impl(*this, format, out, tracer);
 }
-void SharedOutputDataImpl::format_serialize(std::ostream &out, const std::string &format, txml::StdoutTracer &tracer) const
+void OutputSessionCtx::format_serialize(std::ostream &out, const std::string &format, txml::StdoutTracer &tracer) const
 {
     format_serialize_impl(*this, format, out, tracer);
 }
 
 /*
-inline void SharedOutputDataImpl::insert(const std::string& word, size_t repeat_num, std::optional<xdxf::XDXFArticle> article)
+inline void OutputSessionCtx::insert(const std::string& word, size_t repeat_num, std::optional<xdxf::XDXFArticle> article)
 {
     auto &comment = article->node_or<xdxf::Comment>("0");
     std::string &cur_val = comment->value();
@@ -140,12 +134,12 @@ inline void SharedOutputDataImpl::insert(const std::string& word, size_t repeat_
     (void)repeat_num;
 }
 
-inline void SharedOutputDataImpl::insert(const std::string& word, std::optional<xdxf::XDXFArticle> article)
+inline void OutputSessionCtx::insert(const std::string& word, std::optional<xdxf::XDXFArticle> article)
 {
     local_dictionary.emplace_back(std::forward_as_tuple(word, Articles{{"", article}}));
 }
 
-inline void SharedOutputDataImpl::insert(const std::string& word, size_t repeat_num, const std::string &lang_to, std::optional<xdxf::XDXFArticle> article)
+inline void OutputSessionCtx::insert(const std::string& word, size_t repeat_num, const std::string &lang_to, std::optional<xdxf::XDXFArticle> article)
 {
     auto &comment = article->node_or<xdxf::Comment>("0");
 
@@ -178,12 +172,12 @@ inline void SharedOutputDataImpl::insert(const std::string& word, size_t repeat_
     (void)repeat_num;
 }
 
-inline size_t SharedOutputDataImpl::size() const
+inline size_t OutputSessionCtx::size() const
 {
     return local_dictionary.size();
 }
 
-inline void SharedOutputDataImpl::dump(std::ostream &out) const
+inline void OutputSessionCtx::dump(std::ostream &out) const
 {
     for (const auto& val : local_dictionary)
     {
@@ -204,7 +198,7 @@ inline void SharedOutputDataImpl::dump(std::ostream &out) const
 namespace v0
 {
 template<class Formatter>
-void format_serialize_impl(const SharedOutputDataImpl& src,const std::string &format, std::ostream& out, Formatter &tracer)
+void format_serialize_impl(const OutputSessionCtx& src,const std::string &format, std::ostream& out, Formatter &tracer)
 {
     if (format == "xdxf")
     {
@@ -235,12 +229,12 @@ void format_serialize_impl(const SharedOutputDataImpl& src,const std::string &fo
 }
 
 
-void format_serialize(const SharedOutputDataImpl& data, std::ostream &out, const std::string &format, txml::StdoutTracer &tracer)
+void format_serialize(const OutputSessionCtx& data, std::ostream &out, const std::string &format, txml::StdoutTracer &tracer)
 {
     format_serialize_impl(data, format, out, tracer);
 }
 
-void format_serialize(const SharedOutputDataImpl& data, std::ostream &out, const std::string &format,txml::EmptyTracer &tracer)
+void format_serialize(const OutputSessionCtx& data, std::ostream &out, const std::string &format,txml::EmptyTracer &tracer)
 {
     format_serialize_impl(data, format, out, tracer);
 }

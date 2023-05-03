@@ -10,11 +10,11 @@ static void init_impl(int version, std::unique_ptr<ISharedTranslatedData> &impl,
 {
     if (version == 0)
     {
-        impl.reset(new v0::SharedOutputDataImpl(std::forward<Args>(args)...));
+        impl.reset(new v0::OutputSessionCtx(std::forward<Args>(args)...));
     }
     else if (version == 1)
     {
-        impl.reset(new v1::SharedOutputDataImpl(std::forward<Args>(args)...));
+        impl.reset(new v1::OutputSessionCtx(std::forward<Args>(args)...));
     }
     else
     {

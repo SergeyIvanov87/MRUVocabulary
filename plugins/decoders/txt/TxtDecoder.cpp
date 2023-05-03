@@ -29,7 +29,7 @@ static void check_ctx(plugin_ctx_t* ctx)
 {
     if(!ctx or !ctx->data)
     {
-        std::string ret("CTX is emty in plugin: ");
+        std::string ret("CTX is empty in plugin: ");
         ret += NAME_PLUGIN_FUNC();
         perror(ret.c_str());
         abort();
@@ -293,6 +293,11 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
         delete reinterpret_cast<txt_context_v0*>(ctx->data);
     }
     free(ctx);
+}
+
+shared_ctx_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
+{
+    return nullptr;
 }
 
 void RELEASE_SHARED_CTX_FUNC(shared_ctx_t* ctx)

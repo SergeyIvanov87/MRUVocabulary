@@ -5,7 +5,6 @@
 #include "PluginHolder.h"
 
 struct SharedDecodedData;
-struct SharedTranslatedData;
 class TranslatorPluginWrapper : public ITranslatorPlugin,
                                 public PluginHolder
 {
@@ -17,14 +16,12 @@ public:
     TranslatorPluginWrapper(PluginHolder &&src);
     ~TranslatorPluginWrapper() noexcept;
 
-    long long translate(PluginCtxPtr &translator_ctx, SharedDecodedData &decoder_ctx) override;
-    SharedTranslatedData* getSharedCtx(PluginCtxPtr &ctx) const override;
-    ITranslatorPlugin::cstr_ptr sharedCtx2CStr(SharedTranslatedData &ctx) const override;
+    long long translate(PluginCtxPtr &translator_ctx, SharedDecodedData &in_decoder_session, SharedCtxPtr& out_translator_session) override;
+    ITranslatorPlugin::cstr_ptr sharedCtx2CStr(PluginCtxPtr &translator_ctx, SharedCtxPtr& in_translator_session) const override;
 
     static TranslatorPluginPtr loadPlugin(const std::string &fileName);
 private:
     translate_data_ptr translate_data_function;
-    get_translated_ctx_ptr get_shared_ctx_function;
     shared_ctx_2_cstr_ptr  shared_ctx_2_cstr_function;
 
 };

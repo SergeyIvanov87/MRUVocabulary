@@ -43,7 +43,7 @@ static void check_ctx(plugin_ctx_t* ctx)
 {
     if(!ctx or !ctx->data)
     {
-        std::string ret("CTX is emty in plugin: ");
+        std::string ret("CTX is empty in plugin: ");
         ret += NAME_PLUGIN_FUNC();
         perror(ret.c_str());
         abort();
@@ -70,14 +70,14 @@ static void check_ctx(plugin_ctx_t* ctx)
 
 namespace plugin_inner_op
 {
-    inline void insert_data(v0::SharedOutputDataImpl &data, const std::string &word, const std::optional<xdxf::XDXFArticle> &art);
-    inline void insert_data(v1::SharedOutputDataImpl &data, const std::string &word, const std::optional<MultiArticle> &art);
+    inline void insert_data(v0::OutputSessionCtx &data, const std::string &word, const std::optional<xdxf::XDXFArticle> &art);
+    inline void insert_data(v1::OutputSessionCtx &data, const std::string &word, const std::optional<MultiArticle> &art);
 
     template<class Formatter>
-    inline void format_dump(const v0::SharedOutputDataImpl &data, Formatter &out, const std::string &format);
+    inline void format_dump(const v0::OutputSessionCtx &data, Formatter &out, const std::string &format);
 
     template<class Formatter>
-    inline void format_dump(const v1::SharedOutputDataImpl &data, Formatter &out, const std::string &format);
+    inline void format_dump(const v1::OutputSessionCtx &data, Formatter &out, const std::string &format);
 }
 
 
@@ -89,7 +89,7 @@ inline void insert_data(int version, ISharedTranslatedData &data, const std::str
     }
     else if(version == 1)
     {
-        plugin_inner_op::insert_data(dynamic_cast<v1::SharedOutputDataImpl&>(data), word, art);
+        plugin_inner_op::insert_data(dynamic_cast<v1::OutputSessionCtx&>(data), word, art);
     }
     else
     {
@@ -101,7 +101,7 @@ inline void insert_data(int version, ISharedTranslatedData &data, const std::str
 {
     if (version == 0)
     {
-        plugin_inner_op::insert_data(dynamic_cast<v0::SharedOutputDataImpl&>(data), word, art);
+        plugin_inner_op::insert_data(dynamic_cast<v0::OutputSessionCtx&>(data), word, art);
     }
     else if(version == 1)
     {
@@ -118,11 +118,11 @@ inline void format_dump(int version, const ISharedTranslatedData &data, Formatte
 {
     if (version == 0)
     {
-        plugin_inner_op::format_dump(dynamic_cast<const v0::SharedOutputDataImpl&>(data), out, format);
+        plugin_inner_op::format_dump(dynamic_cast<const v0::OutputSessionCtx&>(data), out, format);
     }
     else if(version == 1)
     {
-        plugin_inner_op::format_dump(dynamic_cast<const v1::SharedOutputDataImpl&>(data), out, format);
+        plugin_inner_op::format_dump(dynamic_cast<const v1::OutputSessionCtx&>(data), out, format);
     }
     else
     {
@@ -278,9 +278,10 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
             const std::string& name = art->value<xdxf::KeyPhrase>().value();
             if(!inner_ctx->translated_data_ptr)
             {
-                inner_ctx->translated_data_ptr.reset(new SharedTranslatedData(ctx->version));
+                // TODO inner_ctx->translated_data_ptr.reset(new SharedTranslatedData(ctx->version));
+                abort(); //TODO
             }
-            insert_data(ctx->version, inner_ctx->translated_data_ptr->getImpl(), name, art);
+            // insert_data(ctx->version, inner_ctx->translated_data_ptr->getImpl(), name, art);
         }
     }
     catch(const std::exception& e)
@@ -303,7 +304,7 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
     return ctx;
 }
 
-long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_translated_data_t *translated_ctx)
+long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_ctx_t *translated_ctx)
 {
     if (!translated_ctx)
     {
@@ -331,7 +332,7 @@ long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_translated
         //    if (log_level >= eLogLevel::DEBUG_LEVEL)
         //    {
             //ToXDXF out(ss);
-            format_dump(ctx->version, inner_ctx->translated_data_ptr->getImpl(), ss, inner_ctx->fileFormat);
+            format_dump(ctx->version, *inner_ctx->translated_data_ptr, ss, inner_ctx->fileFormat);
         //    }
         //    else
         //    {
@@ -346,7 +347,7 @@ long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_translated
 <description></description>
 <body>)dict_header";
         //xdxf::ToFB2 out(ss);
-        format_dump(ctx->version, inner_ctx->translated_data_ptr->getImpl(), ss, inner_ctx->fileFormat);
+        format_dump(ctx->version, *inner_ctx->translated_data_ptr, ss, inner_ctx->fileFormat);
 
         ss << R"dict_footer(
 </body>
@@ -367,7 +368,7 @@ long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_translated
     return 0;
 }
 
-void xdxf_output_context_v0::merge(SharedTranslatedData *new_data)
+void xdxf_output_context_v0::merge(shared_ctx_t *new_data)
 {
     if (!new_data)
     {
@@ -376,8 +377,18 @@ void xdxf_output_context_v0::merge(SharedTranslatedData *new_data)
 
     if (!translated_data_ptr)
     {
-        translated_data_ptr.reset(new SharedTranslatedData(*new_data));
-        return;
+        if (new_data->version == 0)
+        {
+            translated_data_ptr.reset(new v0::OutputSessionCtx(*reinterpret_cast<ISharedTranslatedData*>(new_data->data)));
+        }
+        else if (new_data->version == 1)
+        {
+            translated_data_ptr.reset(new v1::OutputSessionCtx(*reinterpret_cast<ISharedTranslatedData*>(new_data->data)));
+        }
+        else
+        {
+            throw std::runtime_error("Cannot create SharedTranslatedData, version is unsupported: " + std::to_string(new_data->version));
+        }
     }
 
     //TODO
@@ -444,6 +455,11 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     free(ctx);
 }
 
+shared_ctx_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
+{
+    return nullptr;
+}
+
 void RELEASE_SHARED_CTX_FUNC(shared_ctx_t* ctx)
 {
     if (ctx)
@@ -459,17 +475,17 @@ const char* NAME_PLUGIN_FUNC()
 
 namespace plugin_inner_op
 {
-inline void insert_data(v0::SharedOutputDataImpl &data, const std::string &word, const std::optional<xdxf::XDXFArticle> &article)
+inline void insert_data(v0::OutputSessionCtx &data, const std::string &word, const std::optional<xdxf::XDXFArticle> &article)
 {
-    data.local_dictionary.emplace_back(std::forward_as_tuple(word, v0::SharedOutputDataImpl::Articles{{"", article}}));
+    data.local_dictionary.emplace_back(std::forward_as_tuple(word, v0::OutputSessionCtx::Articles{{"", article}}));
 }
 
-inline void insert_data(v1::SharedOutputDataImpl &data, const std::string &word, const std::optional<MultiArticle> &art)
+inline void insert_data(v1::OutputSessionCtx &data, const std::string &word, const std::optional<MultiArticle> &art)
 {
 }
 
 template<class Formatter>
-inline void format_dump(const v0::SharedOutputDataImpl &data, Formatter &out, const std::string &format)
+inline void format_dump(const v0::OutputSessionCtx &data, Formatter &out, const std::string &format)
 {
     txml::StdoutTracer std_tracer;
     txml::EmptyTracer empty_tracer;
@@ -491,7 +507,7 @@ inline void format_dump(const v0::SharedOutputDataImpl &data, Formatter &out, co
 }
 
 template<class Formatter>
-inline void format_dump(const v1::SharedOutputDataImpl &data, Formatter &out, const std::string &format)
+inline void format_dump(const v1::OutputSessionCtx &data, Formatter &out, const std::string &format)
 {
     txml::StdoutTracer std_tracer;
     txml::EmptyTracer empty_tracer;

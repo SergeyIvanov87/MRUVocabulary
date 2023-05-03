@@ -14,22 +14,18 @@ namespace v0
 class MultiArticle;
 namespace v1
 {
-struct SharedOutputDataImpl final : public ISharedTranslatedData
+struct OutputSessionCtx final : public ISharedTranslatedData
 {
     using Article = std::shared_ptr<MultiArticle>;
     using Articles = Article;
     using translated_tuple_t = std::tuple<std::string/*word*/, Article>;
 
-    SharedOutputDataImpl() = default;
-    SharedOutputDataImpl(ISharedTranslatedData&);
-    SharedOutputDataImpl(const SharedOutputDataImpl&) = default;
-    SharedOutputDataImpl(SharedOutputDataImpl&&) = default;
-    SharedOutputDataImpl& operator=(const SharedOutputDataImpl&) = default;
-    SharedOutputDataImpl& operator=(SharedOutputDataImpl&&) = default;
+    OutputSessionCtx() = default;
+    OutputSessionCtx(ISharedTranslatedData&);
 
     // conv
-    SharedOutputDataImpl& operator=(const v0::TranslatedDataStructure&);
-    ~SharedOutputDataImpl() override;
+    OutputSessionCtx& operator=(const v0::TranslatedDataStructure&);
+    ~OutputSessionCtx() override;
     // std::vector to save the order of words
     std::vector<translated_tuple_t> local_dictionary;
 

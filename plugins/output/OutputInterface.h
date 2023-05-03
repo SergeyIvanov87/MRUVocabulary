@@ -8,6 +8,6 @@ struct IOutputPlugin// : public IPlugin
 {
     virtual ~IOutputPlugin() noexcept {};
 
-    virtual long long writeTranslatedData(PluginCtxPtr &ctx, SharedTranslatedData &decoder_ctx) = 0;
+    virtual long long writeTranslatedData(PluginCtxPtr &ctx, SharedCtxPtr &decoder_ctx) = 0;
 };
 #endif //OUTPUT_PLUGIN_INTERFACE_H

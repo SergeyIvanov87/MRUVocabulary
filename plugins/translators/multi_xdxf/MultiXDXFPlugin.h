@@ -11,7 +11,6 @@
 #include "CommandArguments.h"
 #include <txml/applications/xdxf/xdxf_fwd.h>
 
-struct SharedTranslatedData;
 struct multi_xdxf_dictionary_context_v0
 {
     std::map<std::string, std::string> filePathes;
@@ -25,8 +24,6 @@ struct multi_xdxf_dictionary_context_v0
     using Dictionary = std::map<std::string/*word*/, Article/*meaning*/>;
     using Volume = std::map<std::string/*language*/, Dictionary>;
     Volume multidictionary;
-
-    std::unique_ptr<SharedTranslatedData> shared_data_ptr;
 };
 
 #endif //MULTI_XDXF_DICTIONARY_H
