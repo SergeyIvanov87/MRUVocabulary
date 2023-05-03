@@ -11,7 +11,8 @@ class PluginHolder : virtual public IPlugin
 {
 public:
     using PluginHolderPtr = std::shared_ptr<PluginHolder>;
-    using PluginCtxPtr = std::unique_ptr<plugin_ctx_t, release_ptr>;
+    using PluginCtxPtr = std::unique_ptr<plugin_ctx_t, release_plugin_ptr>;
+    using SharedCtxPtr = std::unique_ptr<shared_ctx_t, release_shared_ctx_ptr>;
 
     PluginHolder(void *handle);
     PluginHolder(PluginHolder &&src);
@@ -41,7 +42,8 @@ private:
     void *dl_handle;
     init_ptr init_function;
     set_typed_params_ptr set_typed_params_function;
-    release_ptr releases_function;
+    release_plugin_ptr releases_plugin_function;
+    release_shared_ctx_ptr releases_shared_ctx_function;
 
     std::string name;
     bool setParam(PluginCtxPtr &ctx, const ValueBase& param, const void *data) override;

@@ -8,7 +8,7 @@
 #include "BasePluginExports.h"
 
 struct ValueBase;
-using PluginCtxPtr = std::unique_ptr<plugin_ctx_t, release_ptr>;
+using PluginCtxPtr = std::unique_ptr<plugin_ctx_t, release_plugin_ptr>;
 struct IPlugin
 {
      virtual ~IPlugin() noexcept {};

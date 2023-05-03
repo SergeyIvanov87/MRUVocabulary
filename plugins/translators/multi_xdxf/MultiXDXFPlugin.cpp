@@ -432,6 +432,16 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     free(ctx);
 }
 
+void RELEASE_SHARED_CTX_FUNC(shared_ctx_t* ctx)
+{
+    if (ctx)
+    {
+        // TODO check_ctx(ctx);
+        // TODO #delete reinterpret_cast<multi_xdxf_dictionary_context_v0*>(ctx->data);
+    }
+    free(ctx);
+}
+
 template<class Tracer>
 void translate(int version, size_t freq, const std::string &word, multi_xdxf_dictionary_context_v0* inner_ctx, size_t &found_num, Tracer& tracer)
 {

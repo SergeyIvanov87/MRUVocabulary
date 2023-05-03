@@ -295,6 +295,15 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     free(ctx);
 }
 
+void RELEASE_SHARED_CTX_FUNC(shared_ctx_t* ctx)
+{
+    if (ctx)
+    {
+
+    }
+    free(ctx);
+}
+
 const char* NAME_PLUGIN_FUNC()
 {
     return TXT_DECODER_PLUGIN_NAME;
