@@ -2,7 +2,7 @@
 #define XDXF_OUTPUT_PLUGIN_H
 
 #define XDXF_OUTPUT_PLUGIN_NAME         "xdxf_output"
-#define XDXF_OUTPUT_CURRENT_VERSION     0
+#define XDXF_OUTPUT_CURRENT_VERSION     1
 
 #include <map>
 #include <string>

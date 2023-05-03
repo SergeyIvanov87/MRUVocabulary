@@ -1,9 +1,10 @@
 #include <exception>
 #include <iostream>
 
-#include "translators/PluginTranslatedData.h"
-#include "translators/PluginTranslatedDataInterface.h"
+#include "SharedTranslatedData.h"
+#include "ISharedTranslatedData.h"
 #include "translators/vers/TranslatedDataStructure_v0.h"
+#include "translators/vers/TranslatedDataStructure_v1.h"
 
 template<class ...Args>
 static void init_impl(int version, std::unique_ptr<ISharedTranslatedData> &impl, Args&&...args)
@@ -11,6 +12,10 @@ static void init_impl(int version, std::unique_ptr<ISharedTranslatedData> &impl,
     if (version == 0)
     {
         impl.reset(new v0::TranslatedDataStructure(std::forward<Args>(args)...));
+    }
+    else if (version == 1)
+    {
+        impl.reset(new v1::TranslatedDataStructure(std::forward<Args>(args)...));
     }
     else
     {

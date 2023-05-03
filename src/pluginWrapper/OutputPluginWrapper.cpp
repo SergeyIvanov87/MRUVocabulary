@@ -1,7 +1,6 @@
 #include <dlfcn.h>
 #include <string>
 
-#include <Framework/Utils/StringUtils.h>
 #include "pluginWrapper/OutputPluginWrapper.h"
 
 

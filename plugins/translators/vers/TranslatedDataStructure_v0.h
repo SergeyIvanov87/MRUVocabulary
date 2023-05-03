@@ -11,7 +11,7 @@
 
 
 #include <txml/applications/xdxf/xdxf_fwd.h>
-#include "translators/PluginTranslatedDataInterface.h"
+#include "ISharedTranslatedData.h"
 
 namespace v0
 {

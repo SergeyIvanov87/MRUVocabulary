@@ -322,6 +322,8 @@ int main(int argc, const char *argv[])
     SharedTranslatedData* translated = translatorPlugin->getSharedCtx(xdxfctx);
     if (translated)
     {
+        auto str_ptr = translatorPlugin->sharedCtx2CStr(*translated);
+        std::cout << str_ptr.get() << "\nDump finished\n" << std::endl;
         outputPlugin->writeTranslatedData(output_ctx, *translated);
     }
 }

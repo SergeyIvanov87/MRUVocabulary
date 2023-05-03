@@ -1,11 +1,9 @@
 #include <exception>
 #include <iostream>
-#include "../IncomingTranslatorData.h"
+#include "SharedTranslatedData.h"
 
-
-#include "../IncomingTranslatorDataInterface.h"
-#include "xdxf/vers/TranslatorSharedDataImpl_v0.hpp"
-#include "xdxf/vers/TranslatorSharedDataImpl_v1.hpp"
+#include "vers/TranslatorSharedDataImpl_v0.hpp"
+#include "vers/TranslatorSharedDataImpl_v1.hpp"
 
 template<class ...Args>
 static void init_impl(int version, std::unique_ptr<ISharedTranslatedData> &impl, Args&&...args)

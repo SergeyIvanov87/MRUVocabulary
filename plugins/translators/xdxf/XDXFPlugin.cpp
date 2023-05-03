@@ -14,7 +14,7 @@
 #include "common/base_command_parser/TranslationOrder.h"
 #include "common/base_command_parser/CommandArguments.hpp"
 #include <txml/applications/xdxf/xdxf.hpp>
-#include "PluginTranslatedData.h"
+#include "SharedTranslatedData.h"
 
 #include "translators/vers/TranslatedDataStructure_v0.h"
 #include "decoders/PluginDecodedData.h"
@@ -79,12 +79,12 @@ static void check_ctx(plugin_ctx_t* ctx)
 
 namespace plugin_inner_op
 {
-    void insert_data(v0::TranslatedDataStructure &out_data, const std::string& word, size_t repeat_num, std::optional<xdxf::XDXFArticle> article);
-    void dump_data(const v0::TranslatedDataStructure &out_data, std::ostream &out);
+    static void insert_data(v0::TranslatedDataStructure &out_data, const std::string& word, size_t repeat_num, std::optional<xdxf::XDXFArticle> article);
+    static void dump_data(const v0::TranslatedDataStructure &out_data, std::ostream &out);
 }
 
 template<class ...Args>
-void insert_data(int version, ISharedTranslatedData &out_data, Args&&...args)
+static void insert_data(int version, ISharedTranslatedData &out_data, Args&&...args)
 {
     if (version == 0)
     {
@@ -97,7 +97,7 @@ void insert_data(int version, ISharedTranslatedData &out_data, Args&&...args)
 }
 
 template<class ...Args>
-void dump_data(int version, const ISharedTranslatedData &out_data, Args&&...args)
+static void dump_data(int version, const ISharedTranslatedData &out_data, Args&&...args)
 {
     if (version == 0)
     {
@@ -339,7 +339,7 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
 }
 
 template<class Tracer>
-void translate(int version, size_t freq, const std::string &word, xdxf_dictionary_context_v0* inner_ctx, size_t &found_num, Tracer& tracer)
+static void translate(int version, size_t freq, const std::string &word, xdxf_dictionary_context_v0* inner_ctx, size_t &found_num, Tracer& tracer)
 {
     if (auto it = inner_ctx->dictionary.find(word); it != inner_ctx->dictionary.end())
     {
@@ -408,8 +408,9 @@ char *SHARED_CTX_2_STRING_FUNC(shared_translated_data_t* translated_ctx)
     dump_data(translated_ctx->getVersion(), translated_ctx->getImpl(), ss);
 
     const std::string &str = ss.str();
-    char *ret = (char*)malloc(str.size());
+    char *ret = (char*)malloc(str.size() + 1);
     memcpy(ret, str.data(), str.size());
+    ret[str.size()]='\0';
     return ret;
 }
 
@@ -421,7 +422,7 @@ const char* NAME_PLUGIN_FUNC()
 
 namespace plugin_inner_op
 {
-void insert_data(v0::TranslatedDataStructure &out_data, const std::string& word, size_t repeat_num, std::optional<xdxf::XDXFArticle> article)
+static void insert_data(v0::TranslatedDataStructure &out_data, const std::string& word, size_t repeat_num, std::optional<xdxf::XDXFArticle> article)
 {
     auto &comment = article->node_or<xdxf::Comment>("0");
 
@@ -455,15 +456,21 @@ void insert_data(v0::TranslatedDataStructure &out_data, const std::string& word,
 }
 
 
-void dump_data(const v0::TranslatedDataStructure &out_data, std::ostream &out)
+static void dump_data(const v0::TranslatedDataStructure &out_data, std::ostream &out)
 {
-    out << "Translated words: " << out_data.local_dictionary.size() << std::endl;
+    out << "XDXF Translated words: " << out_data.local_dictionary.size() << std::endl;
     for (const auto& val : out_data.local_dictionary)
     {
-        assert(!std::get<1>(val).empty());
-        out << std::get<1>(val).begin()->first << std::endl;
-        std::get<1>(val).begin()->second->xml_serialize(out);
-        out << std::endl;
+        const auto &[word, volume] = val;
+        assert(!volume.empty());
+        out << "languages: " << volume.size() << std::endl;
+        for (const auto &lang_article : volume)
+        {
+            out << lang_article.first << std::endl;
+            lang_article.second->xml_serialize(out);
+            out << std::endl;
+        }
+
     }
 }
 }

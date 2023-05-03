@@ -2,11 +2,14 @@
 #define TRANSLATION_MULTI_ARTICLE_HPP
 #include <txml/applications/xdxf/xdxf_fwd.h>
 
-class LanguageTitle : public txml::XMLNode<LanguageTitle, xdxf::TextElement>
+struct LanguageTitle : public txml::XMLNode<LanguageTitle, xdxf::TextElement>
 {
 public:
     using base = txml::XMLNode<LanguageTitle, xdxf::TextElement>;
+    using base::base;
+
     using value_t = std::string;
+    ~LanguageTitle() = default;
 
     static constexpr std::string_view class_name()
     {
@@ -31,8 +34,9 @@ public:
 
 class TranslationElement : public txml::XMLNode<TranslationElement, LanguageTitle, xdxf::TextElement>
 {
-    public:
+public:
     using base = txml::XMLNode<TranslationElement, LanguageTitle, xdxf::TextElement>;
+    using base::base;
 
     static constexpr std::string_view class_name()
     {
@@ -49,6 +53,7 @@ class TranslationElement : public txml::XMLNode<TranslationElement, LanguageTitl
 class TranslationContainer : public txml::XMLArray<TranslationContainer, TranslationElement>
 {
 public:
+    TranslationContainer() {};
     using base_t = txml::XMLArray<TranslationContainer, TranslationElement>;
 
     static constexpr std::string_view class_name()
@@ -65,6 +70,7 @@ public:
 class MultiArticle : public txml::XMLNode<MultiArticle, xdxf::KeyPhrase, xdxf::Transcription, TranslationContainer>
 {
 public:
+    ~MultiArticle() = default;
     using base_t = txml::XMLNode<MultiArticle, xdxf::KeyPhrase, xdxf::Transcription, TranslationContainer>;
 
     static constexpr std::string_view class_name()

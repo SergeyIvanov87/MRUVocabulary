@@ -1,10 +1,7 @@
 #include <dlfcn.h>
 #include <string>
 
-#include <Framework/Utils/StringUtils.h>
-
 #include "decoders/PluginDecodedData.h"
-#include "translators/PluginTranslatedData.h"
 #include "pluginWrapper/TranslatorPluginWrapper.h"
 
 

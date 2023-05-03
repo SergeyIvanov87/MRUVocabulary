@@ -2,7 +2,7 @@
 #define MULTI_XDXF_DICTIONARY_H
 
 #define MULTI_XDXF_DICTIONARY_PLUGIN_NAME         "multi_xdxf"
-#define MULTI_XDXF_DICTIONARY_CURRENT_VERSION     0
+#define MULTI_XDXF_DICTIONARY_CURRENT_VERSION     1
 
 #include <map>
 #include <string>

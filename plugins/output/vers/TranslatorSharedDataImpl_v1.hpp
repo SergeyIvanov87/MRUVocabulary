@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../IncomingTranslatorDataInterface.h"
+#include "ISharedTranslatedData.h"
 
 namespace v0
 {
@@ -16,7 +16,7 @@ namespace v1
 {
 struct SharedOutputDataImpl final : public ISharedTranslatedData
 {
-    using Article = std::optional<MultiArticle>;
+    using Article = std::shared_ptr<MultiArticle>;
     using Articles = Article;
     using translated_tuple_t = std::tuple<std::string/*word*/, Article>;
 

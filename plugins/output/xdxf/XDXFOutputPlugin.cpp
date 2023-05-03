@@ -16,7 +16,7 @@
 
 #include "Formatter.hpp"
 
-#include "../IncomingTranslatorData.hpp"
+#include "SharedTranslatedData.h"
 #include "vers/TranslatorSharedDataImpl_v1.hpp"
 #include "vers/TranslatorSharedDataImpl_v0.hpp"
 

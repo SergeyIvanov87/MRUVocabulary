@@ -21,6 +21,7 @@ set (INC_DIRECTORIES ${DIRECTORIES}
                      ${DIRECTORIES}/..
                      ${DIRECTORIES}/../..
                      ${DIRECTORIES}/../../interfaces/
+                     ${DIRECTORIES}/../../inter_plugins_interfaces
                      ${DIRECTORIES}/../../../common/base_command_parser
                      ${TTL_ROOT}
     )

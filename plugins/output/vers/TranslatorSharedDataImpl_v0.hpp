@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../IncomingTranslatorDataInterface.h"
+#include "ISharedTranslatedData.h"
 #include <txml/applications/xdxf/xdxf_fwd.h>
 
 #include "../translators/vers/TranslatedDataStructure_v0.h"

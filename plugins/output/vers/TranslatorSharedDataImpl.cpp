@@ -4,28 +4,59 @@
 #include "model/MultiArticle.hpp"
 #include "xdxf/Formatter.hpp"
 #include "model/MultiArticleSerializer.hpp"
-#include "../translators/vers/TranslatedDataStructure_v0.h"
 
 namespace v1
 {
 
 SharedOutputDataImpl::SharedOutputDataImpl(ISharedTranslatedData &src)
 {
-    if (this == &src)
-    {
-        return;
-    }
-
     try
     {
-        SharedOutputDataImpl &casted_src = dynamic_cast<SharedOutputDataImpl&>(src);
-        *this = casted_src;
+        // v0 ???
+        v0::TranslatedDataStructure &casted_src = reinterpret_cast<v0::TranslatedDataStructure&>(src);
+        for (const auto &local_dict_pair : casted_src.local_dictionary)
+        {
+            std::optional<MultiArticle> multi_article;
+            const auto &[word, articles] = local_dict_pair;
+            if (!articles.empty())
+            {
+                multi_article = std::make_optional<MultiArticle>();
+
+            }
+            for (const auto &articles_pair : articles)
+            {
+                const auto &[lang, article] = articles_pair;
+
+                // set keyphrase if doesn't esixt
+                auto &key_phrase = multi_article->node_or<xdxf::KeyPhrase>(article->value<xdxf::KeyPhrase>());
+                // set transcription if doesn't esixt
+                if (article->has_value<xdxf::Transcription>())
+                {
+                    if (! multi_article->has_value<xdxf::Transcription>())
+                    {
+                        multi_article->insert<xdxf::Transcription>(article->value<xdxf::Transcription>());
+                    }
+                }
+
+                // put translation into container
+                auto &tr_container = multi_article->node_or<TranslationContainer>();
+
+                xdxf::TextElement text{std::string(lang)};
+                LanguageTitle lang_title(text);
+                TranslationElement al {lang_title, article->value<xdxf::TextElement>()};
+                tr_container->value().emplace_back(al);
+            }
+
+            local_dictionary.emplace_back(word, std::make_shared<MultiArticle>(*multi_article));
+        }
+
+        abort();
     }
     catch(const std::bad_cast &ex)
     {
         try
         {
-            v0::SharedOutputDataImpl &casted_src = dynamic_cast<v0::SharedOutputDataImpl&>(src);
+            v0::SharedOutputDataImpl &casted_src = reinterpret_cast<v0::SharedOutputDataImpl&>(src);
             *this = casted_src;
         }
         catch(const std::bad_cast &ex)
@@ -180,9 +211,12 @@ void format_serialize_impl(const SharedOutputDataImpl& src,const std::string &fo
         ToXDXF format_out(out);
         for (const auto& val : src.local_dictionary)
         {
-            assert(!std::get<1>(val).empty());
-            std::get<1>(val).begin()->second->format_serialize(format_out, tracer);
-            //out << std::endl;
+            const auto &[word, volume] = val;
+            assert(!volume.empty());
+            for (const auto &lang_article : volume)
+            {
+                lang_article.second->format_serialize(format_out, tracer);
+            }
         }
     }
     else if (format == "fb2")
@@ -190,9 +224,12 @@ void format_serialize_impl(const SharedOutputDataImpl& src,const std::string &fo
         xdxf::ToFB2 format_out(out);
         for (const auto& val : src.local_dictionary)
         {
-            assert(!std::get<1>(val).empty());
-            std::get<1>(val).begin()->second->format_serialize(format_out, tracer);
-            //out << std::endl;
+            const auto &[word, volume] = val;
+            assert(!volume.empty());
+            for (const auto &lang_article : volume)
+            {
+                lang_article.second->format_serialize(format_out, tracer);
+            }
         }
     }
 }
