@@ -3,7 +3,6 @@
 
 #include "interfaces/PluginInterface.h"
 
-struct SharedTranslatedData;
 struct IOutputPlugin// : public IPlugin
 {
     virtual ~IOutputPlugin() noexcept {};

@@ -14,7 +14,6 @@
 #include "common/base_command_parser/TranslationOrder.h"
 #include "common/base_command_parser/CommandArguments.hpp"
 #include <txml/applications/xdxf/xdxf.hpp>
-#include "SharedTranslatedData.h"
 
 #include "translators/vers/TranslatedDataStructure_v0.h"
 #include "translators/vers/TranslatedDataStructure_v1.h"
@@ -562,13 +561,6 @@ long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, session_t* in_deco
     return found_num;
 }
 
-/* -S- shared_translated_data_t* GET_SHARED_TRANSLATED_CTX_FUNC(plugin_ctx_t* translator_ctx)
-{
-    check_ctx(translator_ctx);
-    multi_xdxf_dictionary_context_v0 *inner_ctx = reinterpret_cast<multi_xdxf_dictionary_context_v0*>(translator_ctx->data);
-    return inner_ctx->shared_data_ptr.get();
-}
-*/
 char *SHARED_CTX_2_STRING_FUNC(plugin_ctx_t* in_translator_ctx, session_t* in_translator_session)
 {
     if (!in_translator_ctx || !in_translator_session)

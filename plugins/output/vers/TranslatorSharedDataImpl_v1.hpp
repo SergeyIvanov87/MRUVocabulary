@@ -32,16 +32,5 @@ struct OutputSessionCtx final : public ISharedTranslatedData
 
     void format_serialize(std::ostream &out, const std::string &format,txml::EmptyTracer &tracer) const;
     void format_serialize(std::ostream &out, const std::string &format, txml::StdoutTracer &tracer) const;
-   /* void insert(const std::string& word, size_t repeat_num, std::optional<xdxf::XDXFArticle> article);
-    void insert(const std::string& word, std::optional<xdxf::XDXFArticle> article) override;
-    void insert(const std::string& word, size_t repeat_num, const std::string &lang_to, std::optional<xdxf::XDXFArticle> article);
-
-    size_t size() const override;
-
-    void dump(std::ostream &out) const override;
-
-    template<class Formatter>
-    void format_dump(Formatter &out) const;
-    */
 };
 }

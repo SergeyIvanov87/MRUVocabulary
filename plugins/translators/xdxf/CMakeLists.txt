@@ -49,8 +49,7 @@ add_definitions(${DEFINES_ALL})
 
 list (APPEND  SRC_ALL
                 ${CMAKE_CURRENT_SOURCE_DIR}/XDXFPlugin.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/../PluginTranslatedData.cpp
-    )
+     )
 include_directories(${INC_DIRECTORIES})
 include_directories(${3PP_INCLUDES_DIR})
 include_directories(${CMAKE_SOURCE_DIR})

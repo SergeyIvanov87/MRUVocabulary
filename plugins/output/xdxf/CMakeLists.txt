@@ -54,7 +54,6 @@ add_definitions(${DEFINES_ALL})
 
 list (APPEND  SRC_ALL
                 ${CMAKE_CURRENT_SOURCE_DIR}/XDXFOutputPlugin.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/../IncomingTranslatorData.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/../vers/TranslatorSharedDataImpl.cpp
     )
 

@@ -16,14 +16,8 @@
 
 #include "Formatter.hpp"
 
-#include "SharedTranslatedData.h"
 #include "vers/TranslatorSharedDataImpl_v1.hpp"
 #include "vers/TranslatorSharedDataImpl_v0.hpp"
-
-//#include <txml/applications/xdxf/xdxf.hpp>
-//#include <txml/applications/xdxf/serializer/to_fb2.hpp>
-//#include <libxml++/libxml++.h>
-//#include <libxml++/parsers/textreader.h>
 
 #include "xdxf/model/MultiArticle.hpp"
 
@@ -314,10 +308,6 @@ long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, session_t *transl
     check_ctx(ctx);
     xdxf_output_context_v0 *inner_ctx = reinterpret_cast<xdxf_output_context_v0*>(ctx->data);
 
-    //Stdout std_out;
-    //Tracer<Stdout> std_tracer(std_out);
-    //Tracer<EmptyTracerImpl> empty_tracer;
-
     inner_ctx->merge(translated_ctx);
 
     std::stringstream ss;
@@ -387,7 +377,7 @@ void xdxf_output_context_v0::merge(session_t *new_data)
         }
         else
         {
-            throw std::runtime_error("Cannot create SharedTranslatedData, version is unsupported: " + std::to_string(new_data->version));
+            throw std::runtime_error("Cannot create OutputSessionCtx, version is unsupported: " + std::to_string(new_data->version));
         }
     }
 
@@ -497,12 +487,6 @@ inline void format_dump(const v0::OutputSessionCtx &data, Formatter &out, const 
     else
     {
         v0::format_serialize(data, out, format, empty_tracer);
-        //for (const auto& val : data.local_dictionary)
-        //{
-            //assert(!std::get<1>(val).empty());
-            //std::get<1>(val).begin()->second->format_serialize(out, empty_tracer);
-            //out << std::endl;
-        //}
     }
 }
 
