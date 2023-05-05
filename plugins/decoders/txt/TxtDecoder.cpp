@@ -298,10 +298,14 @@ long long DECODE_PLUGIN_FUNC(plugin_ctx_t* ctx, size_t size, session_t *session_
             //TODO make unordered case-insensitive
             std::transform(word.begin(), word.end(), word.begin(),
                    [](unsigned char c){ return std::tolower(c); });
-
-            if (!std::regex_search(word, *words_regex_ptr) )
+            bool regx_passed = true;
+            if (words_regex_ptr)
             {
+                regx_passed = !std::regex_search(word, *words_regex_ptr);
+            }
 
+            if (regx_passed)
+            {
                 if (filter_words.find(word) == filter_words.end())
                 {
                     decoded_data_ptr->insert(word);

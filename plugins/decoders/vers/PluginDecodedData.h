@@ -9,7 +9,7 @@ struct SharedDecodedData
 {
     using MRU = std::multimap<size_t, std::string>;
     using counts_it = typename MRU::iterator;
-    std::unordered_map<std::string, counts_it> words;
+    std::map<std::string, counts_it> words;
     MRU counts;
 
     void insert(const std::string &word);

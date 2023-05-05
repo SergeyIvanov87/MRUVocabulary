@@ -370,8 +370,10 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
                     }
                     continue;
                 }
-                const std::string& name = art->value<xdxf::KeyPhrase>().value();
+                std::string name = art->value<xdxf::KeyPhrase>().value();
 
+                std::transform(name.begin(), name.end(), name.begin(),
+                               [](unsigned char c){ return std::tolower(c); });
                 target_dictionary.insert({name, art});
 
                 // some dictionaries with translation from english  just add 'to 'before verb
@@ -497,11 +499,16 @@ template<class Tracer>
 void translate(int version, size_t freq, const std::string &word,
                multi_xdxf_dictionary_context_v0 *plugin_ctx_instance, ISharedTranslatedData* inner_ctx, size_t &found_num, Tracer& tracer)
 {
+    std::string lower_case_word = word;
+    std::transform(word.begin(), word.end(), lower_case_word.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+
     for (const auto &lang_dict_pair: plugin_ctx_instance->multidictionary)
     {
-        if (auto it = lang_dict_pair.second.find(word); it != lang_dict_pair.second.end())
+        if (auto it = lang_dict_pair.second.find(lower_case_word); it != lang_dict_pair.second.end())
         {
-            insert_data(version, *inner_ctx, word, freq, lang_dict_pair.first, it->second);
+            const auto &dict_word = it->second->value<xdxf::KeyPhrase>().value();
+            insert_data(version, *inner_ctx, dict_word, freq, lang_dict_pair.first, it->second);
             found_num++;
         }
         else

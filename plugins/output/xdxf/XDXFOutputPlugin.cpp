@@ -116,7 +116,15 @@ inline void format_dump(int version, const ISharedTranslatedData &data, Formatte
     }
     else if(version == 1)
     {
-        plugin_inner_op::format_dump(dynamic_cast<const v1::OutputSessionCtx&>(data), out, format);
+        try
+        {
+            plugin_inner_op::format_dump(dynamic_cast<const v1::OutputSessionCtx&>(data), out, format);
+        }
+        catch(const std::bad_cast &ex)
+        {
+            // downgrade version
+            plugin_inner_op::format_dump(dynamic_cast<const v0::OutputSessionCtx&>(data), out, format);
+        }
     }
     else
     {

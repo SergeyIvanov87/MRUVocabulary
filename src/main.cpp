@@ -311,7 +311,7 @@ int main(int argc, const char *argv[])
     long long elapsedBytes = 0;
     do
     {
-        elapsedBytes = txtPlugin->decodeData(txt_ctx, source_size / 3, decoded_session);
+        elapsedBytes = txtPlugin->decodeData(txt_ctx, source_size, decoded_session);
         std::cout << "elapsedBytes: " << elapsedBytes << std::endl;
 
         //session->dump(std::cout);

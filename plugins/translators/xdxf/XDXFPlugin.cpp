@@ -257,7 +257,9 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
                 }
                 continue;
             }
-            const std::string& name = art->value<xdxf::KeyPhrase>().value();
+            std::string name = art->value<xdxf::KeyPhrase>().value();
+            std::transform(name.begin(), name.end(), name.begin(),
+                           [](unsigned char c){ return std::tolower(c); });
             inner_ctx->dictionary.insert({name, art});
         }
     }
@@ -333,16 +335,32 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     free(ctx);
 }
 
-session_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
+session_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* global_ctx, const u_int8_t *data, size_t size)
 {
-    return nullptr;
+    session_t *ctx = (session_t*)calloc(1, sizeof(session_t));
+    ctx->version = XDXF_DICTIONARY_CURRENT_VERSION;
+    ctx->id = NAME_PLUGIN_FUNC();
+    if (ctx->version == 0)
+    {
+        ctx->data = new v0::TranslatedDataStructure;
+    }
+    else
+    {
+        throw std::runtime_error("Cannot create TranslatedDataStructure, version is unsupported: " + std::to_string(ctx->version));
+    }
+    return ctx;
 }
 
 void RELEASE_SESSION_FUNC(plugin_ctx_t*, session_t* ctx)
 {
     if (ctx)
     {
+        //check_session_ctx(ctx);
+        delete reinterpret_cast<ISharedTranslatedData*>(ctx->data);;
+        ctx->data = nullptr;
     }
+    ctx->version = -1;
+    ctx->id = nullptr;
     free(ctx);
 }
 
@@ -350,14 +368,19 @@ template<class Tracer>
 static void translate(int version, size_t freq, const std::string &word,
                       xdxf_dictionary_context_v0 *plugin_ctx_instance, ISharedTranslatedData* inner_ctx, size_t &found_num, Tracer& tracer)
 {
-    if (auto it = plugin_ctx_instance->dictionary.find(word); it != plugin_ctx_instance->dictionary.end())
+    std::string lower_case_word = word;
+    std::transform(word.begin(), word.end(), lower_case_word.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+
+    if (auto it = plugin_ctx_instance->dictionary.find(lower_case_word); it != plugin_ctx_instance->dictionary.end())
     {
-        insert_data(version, *inner_ctx, word, freq, it->second);
+        const auto &dict_word = it->second->value<xdxf::KeyPhrase>().value();
+        insert_data(version, *inner_ctx, dict_word, freq, it->second);
         found_num++;
     }
     else
     {
-        if (log_level >= eLogLevel::DEBUG_LEVEL)
+        if (log_level >= eLogLevel::INFO_LEVEL)
         {
             tracer.trace(word, " - ", freq, " is not found in: ",
                              plugin_ctx_instance->filePath);
