@@ -9,7 +9,7 @@
 
 struct ValueBase;
 using PluginCtxPtr = std::unique_ptr<plugin_ctx_t, release_plugin_ptr>;
-using SessionPtr = std::unique_ptr<session_t, release_session_ptr>;
+using SessionPtr = std::shared_ptr<session_t>;
 
 struct IPlugin
 {

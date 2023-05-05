@@ -12,7 +12,8 @@ class PluginHolder : virtual public IPlugin
 public:
     using PluginHolderPtr = std::shared_ptr<PluginHolder>;
     using PluginCtxPtr = std::unique_ptr<plugin_ctx_t, release_plugin_ptr>;
-    using SessionPtr = std::unique_ptr<session_t, release_session_ptr>;
+
+    using SessionPtr = std::shared_ptr<session_t>;
 
     PluginHolder(void *handle);
     PluginHolder(PluginHolder &&src);

@@ -145,7 +145,7 @@ session_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t
     return nullptr;
 }
 
-void RELEASE_SESSION_FUNC(session_t* ctx)
+void RELEASE_SESSION_FUNC(plugin_ctx_t*, session_t* ctx)
 {
     if (ctx)
     {

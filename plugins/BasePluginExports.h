@@ -19,8 +19,8 @@
 
 #define ALLOCATE_SESSION_FUNC                alloc_session
 #define ALLOCATE_SESSION_FUNC_STR            "alloc_session"
-#define RELEASE_SESSION_FUNC                 release_shared_ctx
-#define RELEASE_SESSION_FUNC_STR             "release_shared_ctx"
+#define RELEASE_SESSION_FUNC                 release_session_ctx
+#define RELEASE_SESSION_FUNC_STR             "release_session_ctx"
 #define NAME_PLUGIN_FUNC                     name
 #define NAME_PLUGIN_FUNC_STR                 "name"
 
@@ -40,7 +40,7 @@ bool             GET_TYPED_PARAMS_PLUGIN_FUNC   (plugin_ctx_t* ctx, int argc, co
 void             RELEASE_PLUGIN_FUNC            (plugin_ctx_t* ctx);
 
 session_t*       ALLOCATE_SESSION_FUNC          (plugin_ctx_t* ctx, const u_int8_t *data, size_t size);
-void             RELEASE_SESSION_FUNC           (session_t* ctx);
+void             RELEASE_SESSION_FUNC           (plugin_ctx_t* ctx, session_t* sess_ctx);
 
 const char*      NAME_PLUGIN_FUNC               ();
 
@@ -54,7 +54,7 @@ typedef bool (*set_typed_params_ptr)(plugin_ctx_t* ctx, int argc, const void *da
 typedef bool (*get_typed_params_ptr)(plugin_ctx_t* ctx, int argc, const void *data[]);
 
 typedef void (*release_plugin_ptr)(plugin_ctx_t* ctx);
-typedef void (*release_session_ptr)(session_t* ctx);
+typedef void (*release_session_ptr)(plugin_ctx_t *ctx, session_t* sess_ctx);
 typedef const char* (*name_ptr)();
 EXTERN_END
 #endif
