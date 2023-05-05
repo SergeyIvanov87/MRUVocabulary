@@ -269,10 +269,6 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
     }
 
     // finalize inner ctx creation
-    if (!inner_ctx->shared_data_ptr)
-    {
-        inner_ctx->shared_data_ptr.reset(new SharedTranslatedData(ctx->version));
-    }
     ctx->data = reinterpret_cast<void*>(inner_ctx);
     return ctx;
 }
@@ -352,11 +348,12 @@ void RELEASE_SESSION_FUNC(session_t* ctx)
 }
 
 template<class Tracer>
-static void translate(int version, size_t freq, const std::string &word, xdxf_dictionary_context_v0* inner_ctx, size_t &found_num, Tracer& tracer)
+static void translate(int version, size_t freq, const std::string &word,
+                      xdxf_dictionary_context_v0 *plugin_ctx_instance, ISharedTranslatedData* inner_ctx, size_t &found_num, Tracer& tracer)
 {
-    if (auto it = inner_ctx->dictionary.find(word); it != inner_ctx->dictionary.end())
+    if (auto it = plugin_ctx_instance->dictionary.find(word); it != plugin_ctx_instance->dictionary.end())
     {
-        insert_data(version, inner_ctx->shared_data_ptr->getImpl(), word, freq, it->second);
+        insert_data(version, *inner_ctx, word, freq, it->second);
         found_num++;
     }
     else
@@ -364,12 +361,12 @@ static void translate(int version, size_t freq, const std::string &word, xdxf_di
         if (log_level >= eLogLevel::DEBUG_LEVEL)
         {
             tracer.trace(word, " - ", freq, " is not found in: ",
-                             inner_ctx->filePath);
+                             plugin_ctx_instance->filePath);
         }
     }
 }
 
-long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_data_t* in_decoder_ctx,
+long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, session_t* in_decoder_sess,
                                 session_t *out_translator_session)
 {
     check_ctx(translator_ctx);
@@ -378,24 +375,35 @@ long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_dat
     txml::StdoutTracer std_tracer;
     size_t found_num = 0;
 
-    if (!in_decoder_ctx)
+    if (!in_decoder_sess || !in_decoder_sess->data)
     {
         return found_num;
     }
 
-    xdxf_dictionary_context_v0 *inner_ctx = reinterpret_cast<xdxf_dictionary_context_v0*>(translator_ctx->data);
+    SharedDecodedData *in_decoder_ctx = nullptr;
+    if(in_decoder_sess->version == 0)
+    {
+        in_decoder_ctx = reinterpret_cast<SharedDecodedData *>(in_decoder_sess->data);
+    }
+    else
+    {
+        abort();
+    }
+
+    ISharedTranslatedData *inner_ctx = reinterpret_cast<ISharedTranslatedData*>(out_translator_session->data);
+    xdxf_dictionary_context_v0 *ctx = reinterpret_cast<xdxf_dictionary_context_v0*>(translator_ctx->data);
     if (order == "direct")
     {
         for(auto word_pair = in_decoder_ctx->counts.begin(); word_pair != in_decoder_ctx->counts.end(); ++word_pair)
         {
-            translate(translator_ctx->version, word_pair->first, word_pair->second, inner_ctx, found_num, std_tracer);
+            translate(translator_ctx->version, word_pair->first, word_pair->second, ctx, inner_ctx, found_num, std_tracer);
         }
     }
     else
     {
         for(auto word_pair = in_decoder_ctx->counts.rbegin(); word_pair != in_decoder_ctx->counts.rend(); ++word_pair)
         {
-            translate(translator_ctx->version, word_pair->first, word_pair->second, inner_ctx, found_num, std_tracer);
+            translate(translator_ctx->version, word_pair->first, word_pair->second, ctx, inner_ctx, found_num, std_tracer);
         }
     }
 
@@ -412,7 +420,7 @@ shared_translated_data_t* GET_SHARED_TRANSLATED_CTX_FUNC(plugin_ctx_t* translato
 */
 char *SHARED_CTX_2_STRING_FUNC(plugin_ctx_t* in_translator_ctx, session_t* in_translator_session)
 {
-    if (!in_translator_ctx || !in_translator_session)
+    if (!in_translator_ctx || in_translator_ctx->data || !in_translator_session || !in_translator_session->data)
     {
         return nullptr;
     }

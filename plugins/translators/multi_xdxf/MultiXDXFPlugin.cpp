@@ -466,8 +466,6 @@ session_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* global_ctx, const u_int8_t *data,
     session_t *ctx = (session_t*)calloc(1, sizeof(session_t));
     ctx->version = MULTI_XDXF_DICTIONARY_CURRENT_VERSION;
     ctx->id = NAME_PLUGIN_FUNC();
-    // TODO
-    ctx->data = new ISharedTranslatedData(SharedTranslatedData(MULTI_XDXF_DICTIONARY_CURRENT_VERSION).getImpl());
     if (ctx->version == 0)
     {
         ctx->data = new v0::TranslatedDataStructure;
@@ -517,7 +515,7 @@ void translate(int version, size_t freq, const std::string &word,
     }
 }
 
-long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_data_t* in_decoder_ctx,
+long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, session_t* in_decoder_sess,
                                 session_t *out_translator_session)
 {
     check_ctx(translator_ctx);
@@ -527,9 +525,19 @@ long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_dat
     txml::StdoutTracer std_tracer;
     size_t found_num = 0;
 
-    if (!in_decoder_ctx)
+    if (!in_decoder_sess || !in_decoder_sess->data)
     {
         return found_num;
+    }
+
+    SharedDecodedData *in_decoder_ctx = nullptr;
+    if(in_decoder_sess->version == 0)
+    {
+        in_decoder_ctx = reinterpret_cast<SharedDecodedData *>(in_decoder_sess->data);
+    }
+    else
+    {
+        abort();
     }
 
     // restore translator session

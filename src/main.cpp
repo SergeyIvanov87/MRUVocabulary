@@ -241,6 +241,13 @@ int main(int argc, const char *argv[])
     }
 
 
+    PluginHolder::SessionPtr decoded_session = txtPlugin->allocateSession(txt_ctx, nullptr, 0);
+    if(!decoded_session)
+    {
+        std::cerr << "No shared txt_ctx" << std::endl;
+        return -1;
+    }
+
     std::stringstream ss_packer;
     std::string packer_string;
 
@@ -304,18 +311,11 @@ int main(int argc, const char *argv[])
     long long elapsedBytes = 0;
     do
     {
-        elapsedBytes = txtPlugin->decodeData(txt_ctx, source_size / 3);
+        elapsedBytes = txtPlugin->decodeData(txt_ctx, source_size / 3, decoded_session);
         std::cout << "elapsedBytes: " << elapsedBytes << std::endl;
 
         //session->dump(std::cout);
     } while(elapsedBytes);
-
-    SharedDecodedData* decoded_session = txtPlugin->getSharedCtx(txt_ctx);
-    if(!decoded_session)
-    {
-        std::cerr << "No shared txt_ctx" << std::endl;
-        return -1;
-    }
 
     PluginHolder::SessionPtr translator_session = translatorPlugin->allocateSession(xdxfctx, nullptr, 0);
     if (!translator_session)
@@ -323,7 +323,7 @@ int main(int argc, const char *argv[])
         std::cerr << "Cannot create translator session. Exit" << std::endl;
         return -1;
     }
-    size_t translated_num = translatorPlugin->translate(xdxfctx, *decoded_session, translator_session);
+    size_t translated_num = translatorPlugin->translate(xdxfctx, decoded_session, translator_session);
     std::cout << "translated count: " << translated_num << std::endl;
     //auto str_ptr = translatorPlugin->sharedCtx2CStr(xdxfctx, translator_session);
     //std::cout << str_ptr.get() << "\nDump finished\n" << std::endl;

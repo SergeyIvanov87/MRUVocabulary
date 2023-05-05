@@ -97,7 +97,7 @@ PluginHolder::PluginHolderPtr PluginHolder::loadPlugin(const std::string &filena
         release_plugin_ptr releases_plugin_function = plugin->exportFunction<release_plugin_ptr>(RELEASE_PLUGIN_FUNC_STR);
 
         alloc_session_ptr allocate_new_session_function = plugin->exportFunction<alloc_session_ptr>(ALLOCATE_SESSION_FUNC_STR);
-        release_session_ptr releases_shared_ctx_function = plugin->exportFunction<release_session_ptr>(RELEASE_SHARED_CTX_FUNC_STR);
+        release_session_ptr releases_shared_ctx_function = plugin->exportFunction<release_session_ptr>(RELEASE_SESSION_FUNC_STR);
         name_ptr name = plugin->exportFunction<name_ptr>(NAME_PLUGIN_FUNC_STR);
 
         plugin->init_function = init_function;

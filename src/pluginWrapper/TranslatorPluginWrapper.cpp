@@ -1,7 +1,6 @@
 #include <dlfcn.h>
 #include <string>
 
-#include "decoders/vers/PluginDecodedData.h"
 #include "pluginWrapper/TranslatorPluginWrapper.h"
 
 
@@ -20,10 +19,10 @@ TranslatorPluginWrapper::~TranslatorPluginWrapper() noexcept
 }
 
 long long TranslatorPluginWrapper::translate(PluginCtxPtr &translator_ctx,
-                                             SharedDecodedData &in_decoder_session,
-                                             SessionPtr& out_translator_session)
+                                             SessionPtr &in_decoder_session,
+                                             SessionPtr &out_translator_session)
 {
-    auto ret = (*translate_data_function)(translator_ctx.get(), &in_decoder_session, out_translator_session.get());
+    auto ret = (*translate_data_function)(translator_ctx.get(), in_decoder_session.get(), out_translator_session.get());
     return ret;
 }
 
