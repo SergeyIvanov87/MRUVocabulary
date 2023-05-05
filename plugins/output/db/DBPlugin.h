@@ -16,8 +16,6 @@ struct db_context_v0
 {
     std::unique_ptr<DBConnectionPool> connectionPool;
     std::unique_ptr<CommandArgumentsBase> property_holder;
-
-    //SharedDecodedData decoded;
 };
 
 #endif //DB_PLUGIN_H

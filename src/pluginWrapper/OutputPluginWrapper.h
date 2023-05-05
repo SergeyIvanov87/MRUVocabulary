@@ -15,7 +15,7 @@ public:
     OutputPluginWrapper(PluginHolder &&src);
     ~OutputPluginWrapper() noexcept;
 
-    long long writeTranslatedData(PluginCtxPtr &ctx, SharedTranslatedData &translated_ctx) override;
+    long long writeTranslatedData(PluginCtxPtr &ctx, SessionPtr &translated_ctx) override;
 
     static OutputPluginPtr loadPlugin(const std::string &fileName);
 private:

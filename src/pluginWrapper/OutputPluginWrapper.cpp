@@ -1,7 +1,6 @@
 #include <dlfcn.h>
 #include <string>
 
-#include <Framework/Utils/StringUtils.h>
 #include "pluginWrapper/OutputPluginWrapper.h"
 
 
@@ -19,9 +18,9 @@ OutputPluginWrapper::~OutputPluginWrapper() noexcept
 {
 }
 
-long long OutputPluginWrapper::writeTranslatedData(PluginCtxPtr &ctx, SharedTranslatedData &translated_ctx)
+long long OutputPluginWrapper::writeTranslatedData(PluginCtxPtr &ctx, SessionPtr &translated_ctx)
 {
-    auto ret = (*write_decoded_data_function)(ctx.get(), &translated_ctx);
+    auto ret = (*write_decoded_data_function)(ctx.get(), translated_ctx.get());
     return ret;
 }
 

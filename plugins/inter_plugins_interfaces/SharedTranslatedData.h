@@ -7,16 +7,20 @@
 #include <string>
 #include <ostream>
 
-struct SharedTranslatedDataImpl;
+struct ISharedTranslatedData;
 struct SharedTranslatedData
 {
-    SharedTranslatedData();
+    SharedTranslatedData(int version);
     SharedTranslatedData(const SharedTranslatedData &src);
     ~SharedTranslatedData();
 
-    std::unique_ptr<SharedTranslatedDataImpl> impl;
+    int getVersion() const;
+    ISharedTranslatedData &getImpl();
+    const ISharedTranslatedData &getImpl() const;
 
-    void dump(std::ostream &out) const;
+private:
+    int version;
+    std::unique_ptr<ISharedTranslatedData> impl;
 };
 
 #endif

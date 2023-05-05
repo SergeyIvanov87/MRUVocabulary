@@ -4,8 +4,8 @@
 #include <iostream>
 #include "FormatMapper.h"
 
-#include <txml/applications/fb2/fb2.hpp>
-#include <txml/applications/xdxf/xdxf.hpp>
+#include <txml/applications/fb2/fb2_fwd.h>
+#include <txml/applications/xdxf/xdxf_fwd.h>
 //#include <applications/xdxf/XDXFArticle.hpp>
 //#include <applications/fb2/body/Section.hpp>
 //#include <applications/fb2/FB2TextElement.hpp>

@@ -38,6 +38,7 @@ set (INC_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}
                      ${CMAKE_CURRENT_SOURCE_DIR}/..
                      ${CMAKE_CURRENT_SOURCE_DIR}/../..
                      ${CMAKE_CURRENT_SOURCE_DIR}/../../interfaces/
+                     ${CMAKE_CURRENT_SOURCE_DIR}/../../inter_plugins_interfaces
                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../common/base_command_parser
                      ${CMAKE_CURRENT_SOURCE_DIR}/../../../common/db
                      ${TTL_ROOT})

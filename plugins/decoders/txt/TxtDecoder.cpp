@@ -12,7 +12,9 @@
 #include "common/base_command_parser/RegexFilterParam.h"
 #include "common/base_command_parser/FilterWords.hpp"
 #include "common/base_command_parser/RegexFilterWords.hpp"
+#include "common/base_command_parser/CommandArguments.hpp"
 
+#include "vers/PluginDecodedData.h"
 
 void __attribute__((constructor)) initPlugin(void)
 {
@@ -28,7 +30,7 @@ static void check_ctx(plugin_ctx_t* ctx)
 {
     if(!ctx or !ctx->data)
     {
-        std::string ret("CTX is emty in plugin: ");
+        std::string ret("CTX is empty in plugin: ");
         ret += NAME_PLUGIN_FUNC();
         perror(ret.c_str());
         abort();
@@ -51,6 +53,27 @@ static void check_ctx(plugin_ctx_t* ctx)
         perror(ret.c_str());
         abort();
     }
+}
+
+static void check_session_ctx(session_t* sctx)
+{
+    if(!sctx or !sctx->data)
+    {
+        std::string ret("session is empty in plugin: ");
+        ret += NAME_PLUGIN_FUNC();
+        perror(ret.c_str());
+        abort();
+    }
+
+    if (!sctx->id)
+    {
+        std::string ret("session id is unknown, plugin: ");
+        ret += NAME_PLUGIN_FUNC();
+        perror(ret.c_str());
+        abort();
+    }
+
+    //TODO version check
 }
 
 std::list<std::string> tokenize(const std::string &data, std::string rgx_str, size_t& elapsed)
@@ -154,10 +177,19 @@ bool SET_TYPED_PARAMS_PLUGIN_FUNC(plugin_ctx_t* ctx, int argc, const void *data[
     return true;
 }
 
-long long DECODE_PLUGIN_FUNC(plugin_ctx_t* ctx, size_t size)
+long long DECODE_PLUGIN_FUNC(plugin_ctx_t* ctx, size_t size, session_t *session_ctx)
 {
     check_ctx(ctx);
+    check_session_ctx(session_ctx);
+
     txt_context_v0 *inner_ctx = reinterpret_cast<txt_context_v0*>(ctx->data);
+
+    SharedDecodedData *decoded_data_ptr = nullptr;
+    if (session_ctx->version == 0)
+    {
+        decoded_data_ptr = reinterpret_cast<SharedDecodedData*>(session_ctx->data);
+    }
+
     FILE* file = fopen(inner_ctx->filePath.c_str(), "r");
     if(!file)
     {
@@ -272,7 +304,7 @@ long long DECODE_PLUGIN_FUNC(plugin_ctx_t* ctx, size_t size)
 
                 if (filter_words.find(word) == filter_words.end())
                 {
-                    inner_ctx->decoded.insert(word);
+                    decoded_data_ptr->insert(word);
                 }
             }
         }
@@ -294,14 +326,37 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     free(ctx);
 }
 
+session_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* global_ctx, const u_int8_t *data, size_t size)
+{
+    session_t *ctx = (session_t*)calloc(1, sizeof(session_t));
+    ctx->version = TXT_DECODER_CURRENT_VERSION;
+    ctx->id = NAME_PLUGIN_FUNC();
+    // TODO
+    if (ctx->version == 0)
+    {
+        ctx->data = new SharedDecodedData;
+    }
+    else
+    {
+        throw std::runtime_error("Cannot create SharedDecodedData, version is unsupported: " + std::to_string(ctx->version));
+    }
+    return ctx;
+}
+
+void RELEASE_SESSION_FUNC(plugin_ctx_t*, session_t* ctx)
+{
+    if (ctx)
+    {
+        check_session_ctx(ctx);
+        delete reinterpret_cast<SharedDecodedData*>(ctx->data);;
+        ctx->data = nullptr;
+    }
+    ctx->version = -1;
+    ctx->id = nullptr;
+    free(ctx);
+}
+
 const char* NAME_PLUGIN_FUNC()
 {
     return TXT_DECODER_PLUGIN_NAME;
-}
-
-void* GET_SHARED_PLUGIN_CTX_FUNC(plugin_ctx_t* ctx)
-{
-    check_ctx(ctx);
-    txt_context_v0 *inner_ctx = reinterpret_cast<txt_context_v0*>(ctx->data);
-    return &inner_ctx->decoded;
 }

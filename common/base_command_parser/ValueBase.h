@@ -43,7 +43,7 @@ struct TypedValue : public ValueBase
     using value_t = ValueImpl;
 
     TypedValue(value_t v);
-    value_t getValue() const;
+    const value_t &getValue() const;
 protected:
     value_t val;
 };
@@ -54,7 +54,7 @@ struct TypedValue<std::string> : public ValueBase
     using value_t = std::string;
 
     TypedValue(value_t v);
-    value_t getValue() const;
+    const value_t &getValue() const;
 private:
     value_t val;
 };

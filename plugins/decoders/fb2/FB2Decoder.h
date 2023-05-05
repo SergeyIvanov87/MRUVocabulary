@@ -8,7 +8,6 @@
 #include <string>
 #include <unordered_map>
 #include "DecoderExport.h"
-#include "PluginDecodedData.h"
 #include "CommandArguments.h"
 #include <txml/applications/fb2/fb2_fwd.h>
 
@@ -19,7 +18,6 @@ struct fb2_context_v0
     std::unique_ptr<CommandArgumentsBase> property_holder;
 
     std::unique_ptr<txml::TextReaderWrapper> xml_reader;
-    SharedDecodedData decoded;
 };
 
 #endif //FB2_DECODER_H

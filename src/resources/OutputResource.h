@@ -4,20 +4,14 @@
 
 class OutputResource :
             public Resources::IBaseResource<OutputResource>,
-            public ISerializable<OutputResource>,
+            public ISerializableIntrusive<OutputResource>,
             public OutputPluginWrapper
 {
 public:
     using Base = Resources::IBaseResource<OutputResource>;
     using Base::ResourcesMap;
 
-    enum
-    {
-        isSerializableSupport = false,
-        isDumpObjectSupport = false
-    };
-
-    ~OutputResource() noexcept;
+     ~OutputResource() noexcept;
 
     //IBaseResource
     constexpr static const char *getResourceTypeDescriptionImpl()

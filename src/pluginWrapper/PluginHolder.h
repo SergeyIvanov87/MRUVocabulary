@@ -11,7 +11,9 @@ class PluginHolder : virtual public IPlugin
 {
 public:
     using PluginHolderPtr = std::shared_ptr<PluginHolder>;
-    using PluginCtxPtr = std::unique_ptr<plugin_ctx_t, release_ptr>;
+    using PluginCtxPtr = std::unique_ptr<plugin_ctx_t, release_plugin_ptr>;
+
+    using SessionPtr = std::shared_ptr<session_t>;
 
     PluginHolder(void *handle);
     PluginHolder(PluginHolder &&src);
@@ -19,6 +21,8 @@ public:
 
     const std::string &getName() const override;
     PluginCtxPtr initPluginCtx(const u_int8_t *data, size_t size) override;
+
+    SessionPtr allocateSession(PluginCtxPtr &ctx, const u_int8_t *data, size_t size) override;
 
     template<class ValueImpl>
     bool setTypedParam(PluginCtxPtr &ctx, const TypedValue<ValueImpl> &param)
@@ -41,7 +45,10 @@ private:
     void *dl_handle;
     init_ptr init_function;
     set_typed_params_ptr set_typed_params_function;
-    release_ptr releases_function;
+    release_plugin_ptr releases_plugin_function;
+
+    alloc_session_ptr allocate_new_session_function;
+    release_session_ptr releases_shared_ctx_function;
 
     std::string name;
     bool setParam(PluginCtxPtr &ctx, const ValueBase& param, const void *data) override;

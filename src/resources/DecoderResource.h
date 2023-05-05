@@ -4,18 +4,12 @@
 
 class DecoderResource :
             public Resources::IBaseResource<DecoderResource>,
-            public ISerializable<DecoderResource>,
+            public ISerializableIntrusive<DecoderResource>,
             public DecoderPluginWrapper
 {
 public:
     using Base = Resources::IBaseResource<DecoderResource>;
     using Base::ResourcesMap;
-
-    enum
-    {
-        isSerializableSupport = false,
-        isDumpObjectSupport = false
-    };
 
     ~DecoderResource() noexcept;
 

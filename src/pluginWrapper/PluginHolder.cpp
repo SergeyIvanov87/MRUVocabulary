@@ -13,7 +13,9 @@ PluginHolder::PluginHolder(PluginHolder &&src) :
     dl_handle(std::move(src.dl_handle)),
     init_function(std::move(src.init_function)),
     set_typed_params_function(std::move(src.set_typed_params_function)),
-    releases_function(std::move(src.releases_function)),
+    releases_plugin_function(std::move(src.releases_plugin_function)),
+    allocate_new_session_function(std::move(src.allocate_new_session_function)),
+    releases_shared_ctx_function(std::move(src.releases_shared_ctx_function)),
     name(std::move(src.name))
 {
     src.dl_handle = nullptr;
@@ -34,9 +36,20 @@ const std::string &PluginHolder::getName() const
 
 PluginHolder::PluginCtxPtr PluginHolder::initPluginCtx(const u_int8_t *data, size_t size)
 {
-    PluginHolder::PluginCtxPtr ctx((*init_function)(data, size), releases_function);
+    PluginHolder::PluginCtxPtr ctx((*init_function)(data, size), releases_plugin_function);
 
     return ctx;
+}
+
+PluginHolder::SessionPtr PluginHolder::allocateSession(PluginCtxPtr &ctx, const u_int8_t *data, size_t size)
+{
+    PluginHolder::SessionPtr sess((*allocate_new_session_function)(ctx.get(), data, size), [&](session_t* sess_ctx)
+        {
+            //TODO swap nullptr on ctx, which must become member of PluginHolder
+            this->releases_shared_ctx_function(nullptr, sess_ctx);
+        });
+
+    return sess;
 }
 
 bool PluginHolder::setParam(PluginCtxPtr &ctx, const ValueBase& param, const void *data)
@@ -85,12 +98,17 @@ PluginHolder::PluginHolderPtr PluginHolder::loadPlugin(const std::string &filena
         }*/
 
         set_typed_params_ptr set_param_function = plugin->exportFunction<set_typed_params_ptr>(SET_TYPED_PARAMS_PLUGIN_FUNC_STR);
-        release_ptr releases_function = plugin->exportFunction<release_ptr>(RELEASE_PLUGIN_FUNC_STR);
+        release_plugin_ptr releases_plugin_function = plugin->exportFunction<release_plugin_ptr>(RELEASE_PLUGIN_FUNC_STR);
+
+        alloc_session_ptr allocate_new_session_function = plugin->exportFunction<alloc_session_ptr>(ALLOCATE_SESSION_FUNC_STR);
+        release_session_ptr releases_shared_ctx_function = plugin->exportFunction<release_session_ptr>(RELEASE_SESSION_FUNC_STR);
         name_ptr name = plugin->exportFunction<name_ptr>(NAME_PLUGIN_FUNC_STR);
 
         plugin->init_function = init_function;
         plugin->set_typed_params_function = set_param_function;
-        plugin->releases_function = releases_function;
+        plugin->releases_plugin_function = releases_plugin_function;
+        plugin->allocate_new_session_function = allocate_new_session_function;
+        plugin->releases_shared_ctx_function = releases_shared_ctx_function;
         plugin->name = (*name)();
     }
     catch(const std::exception &ex)

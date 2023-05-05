@@ -3,12 +3,10 @@
 
 #include "interfaces/PluginInterface.h"
 
-struct SharedDecodedData;
 struct IDecoderPlugin// : virtual public IPlugin
 {
     virtual ~IDecoderPlugin() noexcept {};
 
-    virtual long long decodeData(PluginCtxPtr &ctx, size_t size) = 0;
-    virtual SharedDecodedData* getSharedCtx(PluginCtxPtr &ctx) const = 0;
+    virtual long long decodeData(PluginCtxPtr &ctx, size_t size, SessionPtr &sess) = 0;
 };
 #endif //DECODER_PLUGIN_INTERFACE_H

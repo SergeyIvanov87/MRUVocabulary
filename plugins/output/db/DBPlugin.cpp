@@ -121,7 +121,7 @@ bool SET_TYPED_PARAMS_PLUGIN_FUNC(plugin_ctx_t* ctx, int argc, const void *data[
 }
 
 
-long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_translated_data_t *translated_ctx)
+long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, session_t *translated_ctx)
 {
     printf("%s - NOT IMPLEMENTED", __FUNCTION__);
     (void)ctx;
@@ -139,6 +139,19 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     free(ctx);
 }
 
+
+session_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
+{
+    return nullptr;
+}
+
+void RELEASE_SESSION_FUNC(plugin_ctx_t*, session_t* ctx)
+{
+    if (ctx)
+    {
+    }
+    free(ctx);
+}
 const char* NAME_PLUGIN_FUNC()
 {
     return DB_PLUGIN_NAME;

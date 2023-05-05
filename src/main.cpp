@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iterator>
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -94,6 +95,7 @@ int main(int argc, const char *argv[])
     {
         dst_format_val.reset( new DestinationFormat("fb2"));
         std::cout << DestinationValue::class_name() << " is empty. Use \":" <<  dst_format_val->getValue() << "\"" << std::endl;
+        return -1;
     }
 
 
@@ -205,7 +207,9 @@ int main(int argc, const char *argv[])
         std::cerr << XDXFTranslatorPath::class_name() << " is empty!" << std::endl;
         return -1;
     }
-    std::cout << XDXFTranslatorPath::class_name() << ": " << xdxf_path->getValue() << std::endl;
+    std::cout << XDXFTranslatorPath::class_name() << ": ";
+    std::copy(xdxf_path->getValue().begin(), xdxf_path->getValue().end(), std::ostream_iterator<std::string>(std::cout, ", "));
+    std::cout << std::endl;
 
     /* PLUGINS */
 
@@ -236,6 +240,13 @@ int main(int argc, const char *argv[])
         txtPlugin->setTypedParam(txt_ctx, *regex_filter_words);
     }
 
+
+    PluginHolder::SessionPtr decoded_session = txtPlugin->allocateSession(txt_ctx, nullptr, 0);
+    if(!decoded_session)
+    {
+        std::cerr << "No shared txt_ctx" << std::endl;
+        return -1;
+    }
 
     std::stringstream ss_packer;
     std::string packer_string;
@@ -276,7 +287,15 @@ int main(int argc, const char *argv[])
 
 
     // load plugin TRANSLATOR
-    auto *translatorPlugin = ResourcesFramework::Instance()->getResourceInstancePtr<TranslatorResource>("xdxf");
+    TranslatorResource *translatorPlugin = nullptr;
+    if (xdxf_path->getValue().size() > 1)
+    {
+        translatorPlugin = ResourcesFramework::Instance()->getResourceInstancePtr<TranslatorResource>("multi_xdxf");
+    }
+    else
+    {
+        translatorPlugin = ResourcesFramework::Instance()->getResourceInstancePtr<TranslatorResource>("xdxf");
+    }
     std::stringstream().swap(ss_packer);
     pack_values(ss_packer, xdxf_path, order, logLevel);
     packer_string = ss_packer.str();
@@ -292,24 +311,32 @@ int main(int argc, const char *argv[])
     long long elapsedBytes = 0;
     do
     {
-        elapsedBytes = txtPlugin->decodeData(txt_ctx, source_size / 3);
+        elapsedBytes = txtPlugin->decodeData(txt_ctx, source_size / 3, decoded_session);
         std::cout << "elapsedBytes: " << elapsedBytes << std::endl;
 
-        //shared_ctx->dump(std::cout);
+        //session->dump(std::cout);
     } while(elapsedBytes);
 
-    SharedDecodedData* shared_ctx = txtPlugin->getSharedCtx(txt_ctx);
-    if(!shared_ctx)
+    PluginHolder::SessionPtr translator_session = translatorPlugin->allocateSession(xdxfctx, nullptr, 0);
+    if (!translator_session)
     {
-        std::cerr << "No shared txt_ctx" << std::endl;
+        std::cerr << "Cannot create translator session. Exit" << std::endl;
         return -1;
     }
-
-    size_t translated_num = translatorPlugin->translate(xdxfctx, *shared_ctx);
+    size_t translated_num = translatorPlugin->translate(xdxfctx, decoded_session, translator_session);
     std::cout << "translated count: " << translated_num << std::endl;
-    SharedTranslatedData* translated = translatorPlugin->getSharedCtx(xdxfctx);
-    if (translated)
-    {
-        outputPlugin->writeTranslatedData(output_ctx, *translated);
-    }
+    //auto str_ptr = translatorPlugin->sharedCtx2CStr(xdxfctx, translator_session);
+    //std::cout << str_ptr.get() << "\nDump finished\n" << std::endl;
+    outputPlugin->writeTranslatedData(output_ctx, translator_session);
 }
+
+/*
+(postponed) 1) hide plugin_ctx into PluginWrapper members
+initPluginCtx might be reinmplemented in a way that it will produce a new class PluginWrapperInstance, which carry on this plugin_ctx as its data inside
+(postponed) 2) If we took this consideration - that it doesnt need to pass  plugin_ctx as member functions argument in PluginWrapperInstance
+3) But it|s  exactly session_t what is necessary to pass in these methods
+4) In this interpretation session_t must be transformed into session_t. So we separate plugi initialization step and plugin excuting step
+5) So session free should be renamred to session_free and a new plugin fucntios as session_alloc should be added
+6) plugin_ctx must not bring any pointer on session anymore!
+(postponed) 7) remove IPlugin
+*/

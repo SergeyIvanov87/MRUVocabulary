@@ -7,7 +7,7 @@
 
 TranslatorResource::TranslatorResource(TranslatorPluginWrapper &&impl) :
     Base(),
-    ISerializable<TranslatorResource>(),
+    ISerializableIntrusive<TranslatorResource>(),
     TranslatorPluginWrapper(std::move(impl))
 {
 }

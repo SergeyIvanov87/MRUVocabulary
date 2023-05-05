@@ -19,7 +19,7 @@ set(SYSTEM_NAME OFF CACHE BOOL "Configure for SYSTEM_NAME")
 ##### Include TTL
 set (PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
 
-# Download `templatedXML` from github or use external sources
+# Download `TTL` from github or use external sources
 if (NOT TTL_PATH)
     message ("Use GITHUB version of TTL")
     configure_file(${BRANCH_ROOT}/cmake/ExternalTTL.cmake.in ttl-download/CMakeLists.txt)
@@ -28,7 +28,7 @@ else()
     configure_file(${BRANCH_ROOT}/cmake/ExternalStandaloneTTL.cmake.in ttl-download/CMakeLists.txt)
 endif()
 
-# Configure & Build (optionally) `templatedXML`
+# Configure & Build `TTL`
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
                 RESULT_VARIABLE result
                 OUTPUT_VARIABLE output
@@ -37,6 +37,16 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
 if(result)
     message(FATAL_ERROR "CMake step for TTL failed: ${result}. Log: ${output}")
 endif()
+
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+                RESULT_VARIABLE result
+                OUTPUT_VARIABLE output
+                ERROR_VARIABLE output
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/ttl-download )
+if(result)
+    message(INFO "TODO: Will add CMakeLists.txt. for TTL Build step for TTL failed: ${result}. Log: ${output}")
+endif()
+
 
 # Postprocessing of `TTL` configuration
 if (NOT TTL_PATH)
@@ -74,7 +84,7 @@ add_subdirectory(plugins)
 
 #==============================================================================
 #Compile flags
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -rdynamic -O0 -g3 -MD -Wall -Wno-invalid-offsetof -std=c++1z")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a -rdynamic -O0 -g3 -MD -Wall -Wno-invalid-offsetof -std=c++1z")
 
 #DEBUG option
 list (APPEND DEFINES_ALL -DDEBUG)
