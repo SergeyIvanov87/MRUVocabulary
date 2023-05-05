@@ -9,7 +9,7 @@
 
 struct ValueBase;
 using PluginCtxPtr = std::unique_ptr<plugin_ctx_t, release_plugin_ptr>;
-using SharedCtxPtr = std::unique_ptr<shared_ctx_t, release_session_ptr>;
+using SessionPtr = std::unique_ptr<session_t, release_session_ptr>;
 
 struct IPlugin
 {
@@ -17,7 +17,7 @@ struct IPlugin
 
     virtual const std::string &getName() const = 0;
     virtual PluginCtxPtr initPluginCtx(const u_int8_t *data, size_t size) = 0;
-    virtual SharedCtxPtr allocateSession(PluginCtxPtr &ctx, const u_int8_t *data, size_t size) = 0;
+    virtual SessionPtr allocateSession(PluginCtxPtr &ctx, const u_int8_t *data, size_t size) = 0;
     virtual bool setParam(PluginCtxPtr &ctx, const ValueBase& param, const void *data) = 0;
 };
 #endif

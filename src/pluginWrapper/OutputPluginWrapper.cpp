@@ -18,7 +18,7 @@ OutputPluginWrapper::~OutputPluginWrapper() noexcept
 {
 }
 
-long long OutputPluginWrapper::writeTranslatedData(PluginCtxPtr &ctx, SharedCtxPtr &translated_ctx)
+long long OutputPluginWrapper::writeTranslatedData(PluginCtxPtr &ctx, SessionPtr &translated_ctx)
 {
     auto ret = (*write_decoded_data_function)(ctx.get(), translated_ctx.get());
     return ret;

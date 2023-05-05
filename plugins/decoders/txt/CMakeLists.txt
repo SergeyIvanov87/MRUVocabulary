@@ -26,11 +26,6 @@ set (INC_DIRECTORIES ${DIRECTORIES}
                      ${TTL_ROOT}
     )
 
-#Source dir
-set (SRC_DIRECTORIES ${DIRECTORIES}
-                     ${DIRECTORIES}/../
-                     ${DIRECTORIES}/../../interfaces_impl/)
-
 #==============================================================================
 #Compile flags
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -O0 -g3 -MD -Wall -Wno-invalid-offsetof ")
@@ -51,13 +46,10 @@ list(REMOVE_DUPLICATES DEFINES_ALL)
 
 add_definitions(${DEFINES_ALL})
 
-foreach (_dir ${SRC_DIRECTORIES})
-    file(GLOB _src ${_dir}/*.cpp)
-    list(APPEND SRC_ALL ${_src})
-
-    file(GLOB _src ${_dir}/*.c)
-    list(APPEND SRC_ALL ${_src})
-endforeach()
+list (APPEND  SRC_ALL
+                ${CMAKE_CURRENT_SOURCE_DIR}/TxtDecoder.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/../vers/PluginDecodedData.cpp
+    )
 
 include_directories(${INC_DIRECTORIES})
 include_directories(${3PP_INCLUDES_DIR})

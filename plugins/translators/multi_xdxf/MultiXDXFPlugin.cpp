@@ -18,7 +18,7 @@
 
 #include "translators/vers/TranslatedDataStructure_v0.h"
 #include "translators/vers/TranslatedDataStructure_v1.h"
-#include "decoders/PluginDecodedData.h"
+#include "decoders/vers/PluginDecodedData.h"
 
 struct indent {
   int depth_;
@@ -69,11 +69,11 @@ void __attribute__ ((destructor)) cleanPlugin(void)
     printf("MultiXDXF Plugin is exited\n");
 }
 
-static void check_session_ctx(shared_ctx_t* sctx)
+static void check_session_ctx(session_t* sctx)
 {
     if(!sctx or !sctx->data)
     {
-        std::string ret("shared_ctx is empty in plugin: ");
+        std::string ret("session is empty in plugin: ");
         ret += NAME_PLUGIN_FUNC();
         perror(ret.c_str());
         abort();
@@ -81,7 +81,7 @@ static void check_session_ctx(shared_ctx_t* sctx)
 
     if (!sctx->id)
     {
-        std::string ret("shared_ctx id is unknown, plugin: ");
+        std::string ret("session id is unknown, plugin: ");
         ret += NAME_PLUGIN_FUNC();
         perror(ret.c_str());
         abort();
@@ -461,9 +461,9 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     free(ctx);
 }
 
-shared_ctx_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* global_ctx, const u_int8_t *data, size_t size)
+session_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* global_ctx, const u_int8_t *data, size_t size)
 {
-    shared_ctx_t *ctx = (shared_ctx_t*)calloc(1, sizeof(shared_ctx_t));
+    session_t *ctx = (session_t*)calloc(1, sizeof(session_t));
     ctx->version = MULTI_XDXF_DICTIONARY_CURRENT_VERSION;
     ctx->id = NAME_PLUGIN_FUNC();
     // TODO
@@ -483,7 +483,7 @@ shared_ctx_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* global_ctx, const u_int8_t *da
     return ctx;
 }
 
-void RELEASE_SHARED_CTX_FUNC(shared_ctx_t* ctx)
+void RELEASE_SESSION_FUNC(session_t* ctx)
 {
     if (ctx)
     {
@@ -518,7 +518,7 @@ void translate(int version, size_t freq, const std::string &word,
 }
 
 long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_data_t* in_decoder_ctx,
-                                shared_ctx_t *out_translator_session)
+                                session_t *out_translator_session)
 {
     check_ctx(translator_ctx);
     check_session_ctx(out_translator_session);
@@ -561,7 +561,7 @@ long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_dat
     return inner_ctx->shared_data_ptr.get();
 }
 */
-char *SHARED_CTX_2_STRING_FUNC(plugin_ctx_t* in_translator_ctx, shared_ctx_t* in_translator_session)
+char *SHARED_CTX_2_STRING_FUNC(plugin_ctx_t* in_translator_ctx, session_t* in_translator_session)
 {
     if (!in_translator_ctx || !in_translator_session)
     {

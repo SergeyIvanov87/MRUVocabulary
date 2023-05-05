@@ -41,9 +41,9 @@ PluginHolder::PluginCtxPtr PluginHolder::initPluginCtx(const u_int8_t *data, siz
     return ctx;
 }
 
-PluginHolder::SharedCtxPtr PluginHolder::allocateSession(PluginCtxPtr &ctx, const u_int8_t *data, size_t size)
+PluginHolder::SessionPtr PluginHolder::allocateSession(PluginCtxPtr &ctx, const u_int8_t *data, size_t size)
 {
-    PluginHolder::SharedCtxPtr sess((*allocate_new_session_function)(ctx.get(), data, size), releases_shared_ctx_function);
+    PluginHolder::SessionPtr sess((*allocate_new_session_function)(ctx.get(), data, size), releases_shared_ctx_function);
 
     return sess;
 }

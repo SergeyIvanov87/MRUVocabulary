@@ -307,7 +307,7 @@ int main(int argc, const char *argv[])
         elapsedBytes = txtPlugin->decodeData(txt_ctx, source_size / 3);
         std::cout << "elapsedBytes: " << elapsedBytes << std::endl;
 
-        //shared_ctx->dump(std::cout);
+        //session->dump(std::cout);
     } while(elapsedBytes);
 
     SharedDecodedData* decoded_session = txtPlugin->getSharedCtx(txt_ctx);
@@ -317,7 +317,7 @@ int main(int argc, const char *argv[])
         return -1;
     }
 
-    PluginHolder::SharedCtxPtr translator_session = translatorPlugin->allocateSession(xdxfctx, nullptr, 0);
+    PluginHolder::SessionPtr translator_session = translatorPlugin->allocateSession(xdxfctx, nullptr, 0);
     if (!translator_session)
     {
         std::cerr << "Cannot create translator session. Exit" << std::endl;
@@ -334,9 +334,9 @@ int main(int argc, const char *argv[])
 (postponed) 1) hide plugin_ctx into PluginWrapper members
 initPluginCtx might be reinmplemented in a way that it will produce a new class PluginWrapperInstance, which carry on this plugin_ctx as its data inside
 (postponed) 2) If we took this consideration - that it doesnt need to pass  plugin_ctx as member functions argument in PluginWrapperInstance
-3) But it|s  exactly shared_ctx_t what is necessary to pass in these methods
-4) In this interpretation shared_ctx_t must be transformed into session_t. So we separate plugi initialization step and plugin excuting step
-5) So shared_ctx free should be renamred to session_free and a new plugin fucntios as session_alloc should be added
-6) plugin_ctx must not bring any pointer on shared_ctx anymore!
+3) But it|s  exactly session_t what is necessary to pass in these methods
+4) In this interpretation session_t must be transformed into session_t. So we separate plugi initialization step and plugin excuting step
+5) So session free should be renamred to session_free and a new plugin fucntios as session_alloc should be added
+6) plugin_ctx must not bring any pointer on session anymore!
 (postponed) 7) remove IPlugin
 */

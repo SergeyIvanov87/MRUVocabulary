@@ -17,7 +17,7 @@
 #include "SharedTranslatedData.h"
 
 #include "translators/vers/TranslatedDataStructure_v0.h"
-#include "decoders/PluginDecodedData.h"
+#include "decoders/vers/PluginDecodedData.h"
 
 struct indent {
   int depth_;
@@ -338,12 +338,12 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     free(ctx);
 }
 
-shared_ctx_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
+session_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
 {
     return nullptr;
 }
 
-void RELEASE_SHARED_CTX_FUNC(shared_ctx_t* ctx)
+void RELEASE_SESSION_FUNC(session_t* ctx)
 {
     if (ctx)
     {
@@ -370,7 +370,7 @@ static void translate(int version, size_t freq, const std::string &word, xdxf_di
 }
 
 long long TRANSLATE_PLUGIN_FUNC(plugin_ctx_t* translator_ctx, shared_decoded_data_t* in_decoder_ctx,
-                                shared_ctx_t *out_translator_session)
+                                session_t *out_translator_session)
 {
     check_ctx(translator_ctx);
 
@@ -410,7 +410,7 @@ shared_translated_data_t* GET_SHARED_TRANSLATED_CTX_FUNC(plugin_ctx_t* translato
     return inner_ctx->shared_data_ptr.get();
 }
 */
-char *SHARED_CTX_2_STRING_FUNC(plugin_ctx_t* in_translator_ctx, shared_ctx_t* in_translator_session)
+char *SHARED_CTX_2_STRING_FUNC(plugin_ctx_t* in_translator_ctx, session_t* in_translator_session)
 {
     if (!in_translator_ctx || !in_translator_session)
     {

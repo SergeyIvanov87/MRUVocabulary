@@ -23,7 +23,7 @@ struct xdxf_output_context_v0
 
     std::unique_ptr<ISharedTranslatedData> translated_data_ptr;
 
-    void merge(shared_ctx_t *new_data);
+    void merge(session_t *new_data);
 };
 
 #endif //XDXF_OUTPUT_PLUGIN_H

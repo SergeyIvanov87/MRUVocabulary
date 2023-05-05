@@ -304,7 +304,7 @@ plugin_ctx_t* INIT_PLUGIN_FUNC(const u_int8_t *data, size_t size)
     return ctx;
 }
 
-long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_ctx_t *translated_ctx)
+long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, session_t *translated_ctx)
 {
     if (!translated_ctx)
     {
@@ -368,7 +368,7 @@ long long WRITE_TRANSLATED_DATA_PLUGIN_FUNC(plugin_ctx_t* ctx, shared_ctx_t *tra
     return 0;
 }
 
-void xdxf_output_context_v0::merge(shared_ctx_t *new_data)
+void xdxf_output_context_v0::merge(session_t *new_data)
 {
     if (!new_data)
     {
@@ -455,12 +455,12 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     free(ctx);
 }
 
-shared_ctx_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
+session_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
 {
     return nullptr;
 }
 
-void RELEASE_SHARED_CTX_FUNC(shared_ctx_t* ctx)
+void RELEASE_SESSION_FUNC(session_t* ctx)
 {
     if (ctx)
     {

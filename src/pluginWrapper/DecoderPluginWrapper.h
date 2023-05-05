@@ -2,7 +2,7 @@
 #define DECODER_PLUGIN_WRAPPER_H
 #include <plugins/decoders/DecoderInterface.h>
 #include <plugins/decoders/DecoderExport.h>
-#include "plugins/decoders/PluginDecodedData.h"
+#include "plugins/decoders/vers/PluginDecodedData.h"
 #include "PluginHolder.h"
 
 class DecoderPluginWrapper : public IDecoderPlugin,

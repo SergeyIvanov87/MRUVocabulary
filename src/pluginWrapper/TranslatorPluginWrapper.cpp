@@ -1,7 +1,7 @@
 #include <dlfcn.h>
 #include <string>
 
-#include "decoders/PluginDecodedData.h"
+#include "decoders/vers/PluginDecodedData.h"
 #include "pluginWrapper/TranslatorPluginWrapper.h"
 
 
@@ -21,13 +21,13 @@ TranslatorPluginWrapper::~TranslatorPluginWrapper() noexcept
 
 long long TranslatorPluginWrapper::translate(PluginCtxPtr &translator_ctx,
                                              SharedDecodedData &in_decoder_session,
-                                             SharedCtxPtr& out_translator_session)
+                                             SessionPtr& out_translator_session)
 {
     auto ret = (*translate_data_function)(translator_ctx.get(), &in_decoder_session, out_translator_session.get());
     return ret;
 }
 
-ITranslatorPlugin::cstr_ptr TranslatorPluginWrapper::sharedCtx2CStr(PluginCtxPtr &translator_ctx, SharedCtxPtr& in_translator_session) const
+ITranslatorPlugin::cstr_ptr TranslatorPluginWrapper::sharedCtx2CStr(PluginCtxPtr &translator_ctx, SessionPtr& in_translator_session) const
 {
     return ITranslatorPlugin::cstr_ptr((*shared_ctx_2_cstr_function)(translator_ctx.get(), in_translator_session.get()), &free);
 }

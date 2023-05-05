@@ -8,7 +8,7 @@
 #include <string>
 #include <unordered_map>
 #include "DecoderExport.h"
-#include "PluginDecodedData.h"
+#include "vers/PluginDecodedData.h"
 #include "CommandArguments.h"
 #include <txml/applications/fb2/fb2_fwd.h>
 

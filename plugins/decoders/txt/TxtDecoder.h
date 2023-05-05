@@ -8,7 +8,7 @@
 #include <string>
 #include <unordered_map>
 #include "DecoderExport.h"
-#include "PluginDecodedData.h"
+#include "vers/PluginDecodedData.h"
 #include "CommandArguments.h"
 
 struct txt_context_v0

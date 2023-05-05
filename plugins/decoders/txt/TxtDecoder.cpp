@@ -295,12 +295,12 @@ void RELEASE_PLUGIN_FUNC(plugin_ctx_t* ctx)
     free(ctx);
 }
 
-shared_ctx_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
+session_t* ALLOCATE_SESSION_FUNC(plugin_ctx_t* ctx, const u_int8_t *data, size_t size)
 {
     return nullptr;
 }
 
-void RELEASE_SHARED_CTX_FUNC(shared_ctx_t* ctx)
+void RELEASE_SESSION_FUNC(session_t* ctx)
 {
     if (ctx)
     {
