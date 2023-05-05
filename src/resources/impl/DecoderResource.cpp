@@ -7,7 +7,7 @@
 
 DecoderResource::DecoderResource(DecoderPluginWrapper &&impl) :
     Base(),
-    ISerializable<DecoderResource>(),
+    ISerializableIntrusive<DecoderResource>(),
     DecoderPluginWrapper(std::move(impl))
 {
 }

@@ -4,18 +4,12 @@
 
 class TranslatorResource :
             public Resources::IBaseResource<TranslatorResource>,
-            public ISerializable<TranslatorResource>,
+            public ISerializableIntrusive<TranslatorResource>,
             public TranslatorPluginWrapper
 {
 public:
     using Base = Resources::IBaseResource<TranslatorResource>;
     using Base::ResourcesMap;
-
-    enum
-    {
-        isSerializableSupport = false,
-        isDumpObjectSupport = false
-    };
 
     ~TranslatorResource() noexcept;
 

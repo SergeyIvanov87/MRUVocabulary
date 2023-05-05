@@ -20,24 +20,22 @@ Settings::~Settings()
 
 }
 
-bool Settings::serializeImpl(std::ostream &out)
+size_t Settings::onSerialize(std::ostream &out)
 {
     //TODO
-    serializeParams(out, true);
-    return true;
+    return serializeParams(out, true);
 }
 
-bool Settings::deserializeImpl(std::istream &in)
+size_t Settings::onDeserialize(std::istream &in)
 {
     //TODO
-    bool ret = false;
-    deserializeParams(in, ret);
+    size_t ret = deserializeParams(in, ret);
     if(!ret)
     {
         std::cerr << "Error in: " << __PRETTY_FUNCTION__ << std::endl;
         abort();
     }
-    return true;
+    return ret;
 }
 
 template<class Tracer>

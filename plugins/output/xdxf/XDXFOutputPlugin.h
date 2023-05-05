@@ -2,7 +2,7 @@
 #define XDXF_OUTPUT_PLUGIN_H
 
 #define XDXF_OUTPUT_PLUGIN_NAME         "xdxf_output"
-#define XDXF_OUTPUT_CURRENT_VERSION     0
+#define XDXF_OUTPUT_CURRENT_VERSION     1
 
 #include <map>
 #include <string>
@@ -11,7 +11,7 @@
 #include "CommandArguments.h"
 #include <txml/applications/xdxf/xdxf_fwd.h>
 
-struct SharedTranslatedData;
+class ISharedTranslatedData;
 struct xdxf_output_context_v0
 {
     std::string filePath;
@@ -21,9 +21,9 @@ struct xdxf_output_context_v0
 
     std::unique_ptr<txml::TextReaderWrapper> xml_reader;
 
-    std::unique_ptr<SharedTranslatedData> translated_data_ptr;
+    std::unique_ptr<ISharedTranslatedData> translated_data_ptr;
 
-    void merge(SharedTranslatedData *new_data);
+    void merge(session_t *new_data);
 };
 
 #endif //XDXF_OUTPUT_PLUGIN_H

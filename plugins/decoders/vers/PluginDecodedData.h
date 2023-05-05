@@ -13,13 +13,7 @@ struct SharedDecodedData
     MRU counts;
 
     void insert(const std::string &word);
-    void dump(std::ostream &out) const
-    {
-        for(auto count_pair = counts.rbegin(); count_pair != counts.rend(); ++count_pair)
-        {
-            out << count_pair->second << "\tcount: "  << count_pair->first << std::endl;
-        }
-    }
+    void dump(std::ostream &out) const;
 };
 
 #endif

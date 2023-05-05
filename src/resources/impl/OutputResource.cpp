@@ -7,7 +7,7 @@
 
 OutputResource::OutputResource(OutputPluginWrapper &&impl) :
     Base(),
-    ISerializable<OutputResource>(),
+    ISerializableIntrusive<OutputResource>(),
     OutputPluginWrapper(std::move(impl))
 {
 }

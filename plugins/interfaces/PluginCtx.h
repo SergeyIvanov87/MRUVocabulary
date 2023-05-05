@@ -7,6 +7,7 @@ typedef struct plugin_ctx
 {
     int version;
     const char *id;
+    /** TODO move to PluginPrivate session ctx **/
     size_t data_size;
     size_t data_offset;
     int err;
@@ -14,11 +15,12 @@ typedef struct plugin_ctx
 } plugin_ctx_t;
 
 
-typedef struct shared_ctx
+typedef struct session
 {
     int version;
+    const char *id;
     void *data;
-} shared_ctx_t;
+} session_t;
 
 EXTERN_END
 

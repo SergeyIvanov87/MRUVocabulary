@@ -5,7 +5,7 @@ dbHost	127.0.0.1
 dbPort	1000
 dbUser	db_user
 dbPwd	db_pwd
-xdxf_file	/home/user/work/pet_projects/Vocabulary/dict.xdxf
+xdxf_file	/home/user/work/pet_projects/Vocabulary/dict.xdxf:/home/user/work/pet_projects/Vocabulary/dict.xdxf;
 
 log_level	3
 

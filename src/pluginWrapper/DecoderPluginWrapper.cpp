@@ -23,15 +23,10 @@ DecoderPluginWrapper::~DecoderPluginWrapper() noexcept
 {
 }
 
-long long DecoderPluginWrapper::decodeData(PluginCtxPtr &ctx, size_t size)
+long long DecoderPluginWrapper::decodeData(PluginCtxPtr &ctx, size_t size, SessionPtr &sess)
 {
-    auto ret = (*decode_function)(ctx.get(), size);
+    auto ret = (*decode_function)(ctx.get(), size, sess.get());
     return ret;
-}
-
-SharedDecodedData* DecoderPluginWrapper::getSharedCtx(PluginCtxPtr &ctx) const
-{
-    return reinterpret_cast<SharedDecodedData*>((*get_shared_ctx)(ctx.get()));
 }
 
 DecoderPluginWrapper::DecoderPluginPtr DecoderPluginWrapper::loadPlugin(const std::string &fileName)
@@ -41,8 +36,6 @@ DecoderPluginWrapper::DecoderPluginPtr DecoderPluginWrapper::loadPlugin(const st
     base.reset();
 
     decode_ptr decode_function = plugin->exportFunction<decode_ptr>(DECODE_PLUGIN_FUNC_STR);
-    get_shared_ctx_ptr ctx_shared = plugin->exportFunction<get_shared_ctx_ptr>(GET_SHARED_PLUGIN_CTX_FUNC_STR);
     plugin->decode_function = decode_function;
-    plugin->get_shared_ctx = ctx_shared;
     return plugin;
 }

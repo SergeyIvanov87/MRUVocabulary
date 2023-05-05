@@ -45,35 +45,33 @@ inline std::shared_ptr<Value> ValueBase::deserialize(int &argc, int &arg_offset,
 
 
 template<class Value>
-size_t ValueBase::pack(const Value &param, std::ostream &out)
+inline size_t ValueBase::pack(const Value &param, std::ostream &out)
 {
     //static_assert(not std::is_class_v<typename Value::value_t>, "Only primitive types can be packed");
-    auto val = param.getValue();
-    serializeParams(out, val);
-    return sizeof(val);
+    const auto &val = param.getValue();
+    return serializeParams(out, val);
 }
 
 template<class Value>
-size_t ValueBase::pack(const std::shared_ptr<Value> &param, std::ostream &out)
+inline size_t ValueBase::pack(const std::shared_ptr<Value> &param, std::ostream &out)
 {
     //static_assert(not std::is_class_v<typename Value::value_t>, "Only primitive types can be packed");
     if (!param)
     {
         return 0;
     }
-    auto val = param->getValue();
-    serializeParams(out, val);
-    return sizeof(val);
+    const auto &val = param->getValue();
+    return serializeParams(out, val);
 }
 
 template<class Value>
-std::shared_ptr<Value> ValueBase::unpack(std::istream &in)
+inline std::shared_ptr<Value> ValueBase::unpack(std::istream &in)
 {
     //static_assert(not std::is_class_v<typename Value::value_t>, "Only primitive types can be unpacked");
     typename Value::value_t val{};
     deserializeUnit(in, val);
 
-    std::shared_ptr<Value> param = std::make_shared<Value>(val);
+    std::shared_ptr<Value> param = std::make_shared<Value>(std::move(val));
     return param;
 }
 

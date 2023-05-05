@@ -11,7 +11,6 @@
 #include "CommandArguments.h"
 #include <txml/applications/xdxf/xdxf_fwd.h>
 
-struct SharedTranslatedData;
 struct xdxf_dictionary_context_v0
 {
     std::string filePath;
@@ -20,8 +19,6 @@ struct xdxf_dictionary_context_v0
 
     std::unique_ptr<txml::TextReaderWrapper> xml_reader;
     std::map<std::string, std::optional<xdxf::XDXFArticle>> dictionary;
-
-    std::unique_ptr<SharedTranslatedData> shared_data_ptr;
 };
 
 #endif //XDXF_DICTIONARY_H

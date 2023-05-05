@@ -3,11 +3,11 @@
 
 #include "common/base_command_parser/ValueBase.h"
 
-class XDXFTranslatorPath final: public TypedValue<std::string>
+class XDXFTranslatorPath final: public TypedValue<std::vector<std::string>>
 
 {
 public:
-    using base = TypedValue<std::string>;
+    using base = TypedValue<std::vector<std::string>>;
     using value_t = typename base::value_t;
 
     static constexpr const char* class_name()
@@ -21,7 +21,7 @@ public:
         return mods;
     }
 
-    XDXFTranslatorPath(std::string str);
+    XDXFTranslatorPath(std::vector<std::string> &&str);
     ~XDXFTranslatorPath() = default;
 
     const char *name() const noexcept override

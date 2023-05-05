@@ -25,13 +25,11 @@ set (INC_DIRECTORIES ${DIRECTORIES}
                      ${DIRECTORIES}/..
                      ${DIRECTORIES}/../..
                      ${DIRECTORIES}/../../interfaces/
+                     ${DIRECTORIES}/../../inter_plugins_interfaces
                      ${DIRECTORIES}/../../../common/base_command_parser
                      ${DIRECTORIES}/../../decoders/
+                     ${TTL_ROOT}
     )
-
-#Source dir
-set (SRC_DIRECTORIES ${DIRECTORIES}
-                     ${DIRECTORIES}/../../interfaces_impl/)
 
 #==============================================================================
 #Compile flags
@@ -47,20 +45,15 @@ find_library (LIB_M m)
 list (APPEND LIBS ${LIB_M} ${LIB_MYSQL})
 #==============================================================================
 list(REMOVE_DUPLICATES INC_DIRECTORIES)
-list(REMOVE_DUPLICATES SRC_DIRECTORIES)
 list(REMOVE_DUPLICATES DEFINES_ALL)
 
 
 add_definitions(${DEFINES_ALL})
 
-foreach (_dir ${SRC_DIRECTORIES})
-    file(GLOB _src ${_dir}/*.cpp)
-    list(APPEND SRC_ALL ${_src})
-
-    file(GLOB _src ${_dir}/*.c)
-    list(APPEND SRC_ALL ${_src})
-endforeach()
-
+list (APPEND  SRC_ALL
+                ${CMAKE_CURRENT_SOURCE_DIR}/FB2Decoder.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/../vers/PluginDecodedData.cpp
+    )
 include_directories(${INC_DIRECTORIES})
 include_directories(${3PP_INCLUDES_DIR})
 include_directories(${CMAKE_SOURCE_DIR})

@@ -1,10 +1,6 @@
 #include <dlfcn.h>
 #include <string>
 
-#include <Framework/Utils/StringUtils.h>
-
-#include "decoders/PluginDecodedData.h"
-#include "translators/TranslatorSharedData.h"
 #include "pluginWrapper/TranslatorPluginWrapper.h"
 
 
@@ -23,20 +19,16 @@ TranslatorPluginWrapper::~TranslatorPluginWrapper() noexcept
 }
 
 long long TranslatorPluginWrapper::translate(PluginCtxPtr &translator_ctx,
-                                             SharedDecodedData &decoder_ctx)
+                                             SessionPtr &in_decoder_session,
+                                             SessionPtr &out_translator_session)
 {
-    auto ret = (*translate_data_function)(translator_ctx.get(), &decoder_ctx);
+    auto ret = (*translate_data_function)(translator_ctx.get(), in_decoder_session.get(), out_translator_session.get());
     return ret;
 }
 
-SharedTranslatedData* TranslatorPluginWrapper::getSharedCtx(PluginCtxPtr &ctx) const
+ITranslatorPlugin::cstr_ptr TranslatorPluginWrapper::sharedCtx2CStr(PluginCtxPtr &translator_ctx, SessionPtr& in_translator_session) const
 {
-    return reinterpret_cast<SharedTranslatedData*>((*get_shared_ctx_function)(ctx.get()));
-}
-
-ITranslatorPlugin::cstr_ptr TranslatorPluginWrapper::sharedCtx2CStr(SharedTranslatedData &ctx) const
-{
-    return ITranslatorPlugin::cstr_ptr((*shared_ctx_2_cstr_function)(&ctx), &free);
+    return ITranslatorPlugin::cstr_ptr((*shared_ctx_2_cstr_function)(translator_ctx.get(), in_translator_session.get()), &free);
 }
 
 TranslatorPluginWrapper::TranslatorPluginPtr TranslatorPluginWrapper::loadPlugin(const std::string &fileName)
@@ -47,9 +39,6 @@ TranslatorPluginWrapper::TranslatorPluginPtr TranslatorPluginWrapper::loadPlugin
 
     translate_data_ptr translate_data_function = plugin->exportFunction<translate_data_ptr>(TRANSLATE_PLUGIN_FUNC_STR);
     plugin->translate_data_function = translate_data_function;
-
-    get_translated_ctx_ptr get_shared_ctx_function = plugin->exportFunction<get_translated_ctx_ptr>(GET_SHARED_TRANSLATED_CTX_FUNC_STR);
-    plugin->get_shared_ctx_function = get_shared_ctx_function;
 
     shared_ctx_2_cstr_ptr shared_ctx_2_cstr_function = plugin->exportFunction<shared_ctx_2_cstr_ptr>(SHARED_CTX_2_STRING_FUNC_STR);
     plugin->shared_ctx_2_cstr_function = shared_ctx_2_cstr_function;
