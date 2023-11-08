@@ -61,5 +61,5 @@ add_subdirectory(translators)
 
 
 foreach (p ${PLUGIN_TARGET_LIST})
-    install(TARGETS ${p} DESTINATION /home/user/.vocabulary/plugins)
+    install(TARGETS ${p} DESTINATION  ${CMAKE_INSTALL_PREFIX}/plugins)
 endforeach()

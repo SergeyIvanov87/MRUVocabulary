@@ -43,9 +43,9 @@ int main(int argc, const char *argv[])
         {
             home_path = getpwuid(getuid())->pw_dir;
         }
-        std::string settings_path(home_path);
-        settings_path += "/.vocabulary";
-        ResourcesFramework::initializeResourceHolder(settings_path, "dumps", tracer);
+        //std::string settings_path(home_path);
+        //settings_path += "/.vocabulary";
+        ResourcesFramework::initializeResourceHolder("./", "dumps", tracer);
         std::cout << "Tracer: \n" << tracer.getManagedTracer().str() << std::endl;
     }
     catch(const std::exception &ex)

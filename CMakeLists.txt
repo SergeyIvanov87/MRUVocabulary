@@ -131,8 +131,6 @@ add_library(${PROC_LIB_NAME} STATIC $<TARGET_OBJECTS:mru_objects>)
 set_target_properties(${PROC_LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(${PROC_LIB_NAME} ${LIBS})
 
-
-#execute_process(COMMAND mkdir ${CMAKE_CURRENT_BINARY_DIR}/ASSETS)
-#execute_process(COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/ASSETS/ResourceA)
-#execute_process(COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/ASSETS/ResourceB)
-#execute_process(COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/ASSETS/ResourceC)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/settings.txt.in ${CMAKE_CURRENT_BINARY_DIR}/settings.txt)
+install(TARGETS ${PROC_NAME} DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/settings.txt DESTINATION  ${CMAKE_INSTALL_PREFIX})
