@@ -42,9 +42,7 @@ struct MultiArticleToFB2 : public txml::FormatSerializerBase<MultiArticleToFB2<S
     void serialize_impl(const TranslationContainer& val, Tracer tracer)
     {
         tracer.trace(__FUNCTION__, " - ", TranslationContainer::class_name());
-        out << "<title>";
         val.make_format_serialize(*this, tracer);
-        out << "</title>\n";
         out << "<empty-line/>\n";
     }
 

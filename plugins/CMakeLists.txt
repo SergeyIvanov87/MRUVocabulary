@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 3.1)
 
+SET(PLUGIN_TARGET_LIST  "${PLUGIN_TARGET_LIST}" CACHE INTERNAL "PLUGIN_TARGET_LIST")
+
 set (PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
 
 # Download `templatedXML` from github or use external sources
@@ -56,3 +58,8 @@ add_custom_target(plugins COMMENT "Plugins custom target")
 add_subdirectory(decoders)
 add_subdirectory(output)
 add_subdirectory(translators)
+
+
+foreach (p ${PLUGIN_TARGET_LIST})
+    install(TARGETS ${p} DESTINATION /home/user/.vocabulary/plugins)
+endforeach()

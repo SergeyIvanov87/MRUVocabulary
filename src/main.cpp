@@ -94,8 +94,7 @@ int main(int argc, const char *argv[])
     if (!dst_format_val)
     {
         dst_format_val.reset( new DestinationFormat("fb2"));
-        std::cout << DestinationValue::class_name() << " is empty. Use \":" <<  dst_format_val->getValue() << "\"" << std::endl;
-        return -1;
+        std::cout << DestinationValue::class_name() << " is empty. Use: \"" <<  dst_format_val->getValue() << "\"" << std::endl;
     }
 
 

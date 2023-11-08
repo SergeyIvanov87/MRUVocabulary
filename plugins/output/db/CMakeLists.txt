@@ -89,3 +89,5 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/mariadb-connector-c-build/include)
 
 add_dependencies(outputs ${PROC_NAME})
+
+set(PLUGIN_TARGET_LIST ${PLUGIN_TARGET_LIST} ${PROC_NAME} PARENT_SCOPE)

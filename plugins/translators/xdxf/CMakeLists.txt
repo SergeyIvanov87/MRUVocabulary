@@ -66,3 +66,6 @@ add_dependencies(translators ${PROC_NAME})
 #execute_process(COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/ASSETS/ResourceA)
 #execute_process(COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/ASSETS/ResourceB)
 #execute_process(COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/ASSETS/ResourceC)
+
+
+set(PLUGIN_TARGET_LIST ${PLUGIN_TARGET_LIST} ${PROC_NAME} PARENT_SCOPE)

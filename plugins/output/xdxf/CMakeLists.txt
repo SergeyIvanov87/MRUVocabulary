@@ -70,3 +70,5 @@ set_target_properties(${PROC_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(${PROC_NAME} ${LIBS} TXml)
 
 add_dependencies(outputs ${PROC_NAME})
+
+set(PLUGIN_TARGET_LIST ${PLUGIN_TARGET_LIST} ${PROC_NAME} PARENT_SCOPE)

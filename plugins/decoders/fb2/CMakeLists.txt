@@ -65,3 +65,5 @@ add_library(${PROC_NAME} MODULE ${SRC_ALL})
 set_target_properties(${PROC_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(${PROC_NAME} PUBLIC ${LIBS} TXml)
 add_dependencies(decoders ${PROC_NAME})
+
+set(PLUGIN_TARGET_LIST ${PLUGIN_TARGET_LIST} ${PROC_NAME} PARENT_SCOPE)
